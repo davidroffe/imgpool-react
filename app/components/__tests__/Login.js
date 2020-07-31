@@ -1,17 +1,20 @@
-/**
- * @jest-environment jsdom
- */
-
 import React from 'react';
-import { mount } from 'enzyme';
-import Login from '../Login';
-import rootReducer from '../../reducers';
-import { createStore } from 'redux';
-
-const store = createStore(rootReducer);
+import { shallow } from 'enzyme';
+import { Login } from '../Login';
 
 describe('Login', () => {
-  var root = mount(<Login store={store} history={{}} />);
+  var root = shallow(
+    <Login
+      history={{}}
+      dispatch={() => {}}
+      email={''}
+      username={''}
+      password={''}
+      passwordConfirm={''}
+      userInit={false}
+      isLoggedIn={false}
+    />
+  );
 
   it('should update <input id="email" /> value', () => {
     let emailInput = root.find('#email').at(0);
