@@ -16,7 +16,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const Login = (props) => {
+export const Login = (props) => {
   const [form, setForm] = useState('login');
   const [canSignUp, setCanSignUp] = useState(true);
 
