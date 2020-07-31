@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Input from '../Utility/Input';
 import Modal from '../Utility/Modal';
 
-const EditAccount = props => {
+const EditAccount = (props) => {
   return (
     <Modal show={props.data.show} toggleModal={props.clearValues}>
       <form id="edit-form" className="form-light" onSubmit={props.handleSubmit}>
         <div className="field-container">
           {props.data.field === 'edit-username' ? (
-            <Input
+            <input
               id="username"
               autoComplete={'off'}
               type={'text'}
@@ -17,7 +16,7 @@ const EditAccount = props => {
               name={'username'}
               value={props.data.username}
               placeholder={'USERNAME'}
-              handleChange={props.handleChange.bind(
+              onChange={props.handleChange.bind(
                 null,
                 'editAccount',
                 'username'
@@ -25,7 +24,7 @@ const EditAccount = props => {
             />
           ) : null}
           {props.data.field === 'edit-email' ? (
-            <Input
+            <input
               id="email"
               autoComplete={'off'}
               type={'text'}
@@ -33,16 +32,12 @@ const EditAccount = props => {
               name={'email'}
               value={props.data.email}
               placeholder={'EMAIL'}
-              handleChange={props.handleChange.bind(
-                null,
-                'editAccount',
-                'email'
-              )}
+              onChange={props.handleChange.bind(null, 'editAccount', 'email')}
             />
           ) : null}
           {props.data.field === 'edit-password' ? (
             <div>
-              <Input
+              <input
                 id="password"
                 autoComplete={'off'}
                 type={'password'}
@@ -50,13 +45,13 @@ const EditAccount = props => {
                 name={'password'}
                 value={props.data.password}
                 placeholder={'PASSWORD'}
-                handleChange={props.handleChange.bind(
+                onChange={props.handleChange.bind(
                   null,
                   'editAccount',
                   'password'
                 )}
               />
-              <Input
+              <input
                 id="passwordConfirm"
                 autoComplete={'off'}
                 type={'password'}
@@ -64,7 +59,7 @@ const EditAccount = props => {
                 name={'password-confirm'}
                 value={props.data.passwordConfirm}
                 placeholder={'CONFIRM PASSWORD'}
-                handleChange={props.handleChange.bind(
+                onChange={props.handleChange.bind(
                   null,
                   'editAccount',
                   'passwordConfirm'
@@ -83,7 +78,7 @@ const EditAccount = props => {
             />
           ) : null}
         </div>
-        <Input className="border-button" type="submit" />
+        <input className="border-button" type="submit" />
       </form>
     </Modal>
   );
@@ -100,8 +95,8 @@ EditAccount.propTypes = {
     username: PropTypes.string.isRequired,
     bio: PropTypes.string.isRequired,
     password: PropTypes.string.isRequired,
-    passwordConfirm: PropTypes.string.isRequired
-  })
+    passwordConfirm: PropTypes.string.isRequired,
+  }),
 };
 
 export default EditAccount;
