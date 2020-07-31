@@ -4,12 +4,11 @@ import { setUser } from '../actions';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
-import Input from './Utility/Input';
 
-const PasswordReset = props => {
+const PasswordReset = (props) => {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const handlePasswordResetSubmit = e => {
+  const handlePasswordResetSubmit = (e) => {
     e.preventDefault();
 
     let newErrorMessage = [];
@@ -22,7 +21,7 @@ const PasswordReset = props => {
       newErrorMessage.push('Password must be at least 8 characters.');
     }
     if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach(error => {
+      newErrorMessage.forEach((error) => {
         toast.error(error);
       });
     } else {
@@ -31,16 +30,16 @@ const PasswordReset = props => {
         method: 'post',
         params: {
           passwordResetToken: props.match.params.passwordResetToken,
-          password: password
-        }
+          password: password,
+        },
       })
-        .then(res => {
+        .then((res) => {
           props.dispatch(setUser('email', res.data.email));
           props.dispatch(setUser('username', res.data.username));
           props.dispatch(setUser('loggedIn', true));
           props.history.push('/account');
         })
-        .catch(error => {
+        .catch((error) => {
           toast.error(error.response.data);
         });
     }
@@ -51,7 +50,7 @@ const PasswordReset = props => {
       <div id="center-box">
         <form className="form-dark" onSubmit={handlePasswordResetSubmit}>
           <div className="field-container">
-            <Input
+            <input
               id="password"
               autoComplete={'off'}
               type={'password'}
@@ -59,9 +58,9 @@ const PasswordReset = props => {
               name={'password'}
               value={password}
               placeholder={'PASSWORD'}
-              handleChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
-            <Input
+            <input
               id="passwordConfirm"
               autoComplete={'off'}
               type={'password'}
@@ -69,10 +68,10 @@ const PasswordReset = props => {
               name={'password-confirm'}
               value={passwordConfirm}
               placeholder={'CONFIRM PASSWORD'}
-              handleChange={e => setPasswordConfirm(e.target.value)}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
             />
           </div>
-          <Input
+          <input
             className="border-button"
             type="submit"
             value="RESET PASSWORD"
@@ -86,7 +85,7 @@ const PasswordReset = props => {
 PasswordReset.propTypes = {
   dispatch: PropTypes.func.isRequired,
   match: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
 };
 
 export default connect(() => {

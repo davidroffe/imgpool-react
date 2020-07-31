@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Input from './Utility/Input';
 import Modal from './Utility/Modal';
 
-const FlagPost = props => {
+const FlagPost = (props) => {
   return (
     <Modal show={props.data.show} toggleModal={props.clearValues}>
       <form
@@ -21,7 +20,7 @@ const FlagPost = props => {
             onChange={props.handleChange}
           />
         </div>
-        <Input className="border-button" type="submit" />
+        <input className="border-button" type="submit" />
       </form>
     </Modal>
   );
@@ -33,8 +32,8 @@ FlagPost.propTypes = {
   clearValues: PropTypes.func.isRequired,
   data: PropTypes.shape({
     show: PropTypes.bool.isRequired,
-    reason: PropTypes.string.isRequired
-  })
+    reason: PropTypes.string.isRequired,
+  }),
 };
 
 export default FlagPost;

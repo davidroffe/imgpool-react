@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Input from '../Utility/Input';
 import FileInput from '../Utility/FileInput';
 import Modal from '../Utility/Modal';
 
-const CreatePost = props => {
+const CreatePost = (props) => {
   return (
     <Modal show={props.data.show} toggleModal={props.clearValues}>
       <form id="post-form" className="form-light" onSubmit={props.handleSubmit}>
@@ -16,7 +15,7 @@ const CreatePost = props => {
             value={props.data.file.name}
             handleChange={props.handleChange.bind(null, 'createPost', 'file')}
           />
-          <Input
+          <input
             id="source"
             autoComplete={'off'}
             type={'text'}
@@ -24,9 +23,9 @@ const CreatePost = props => {
             name={'source'}
             value={props.data.source}
             placeholder={'SOURCE URL'}
-            handleChange={props.handleChange.bind(null, 'createPost', 'source')}
+            onChange={props.handleChange.bind(null, 'createPost', 'source')}
           />
-          <Input
+          <input
             id="tags"
             autoComplete={'off'}
             type={'text'}
@@ -34,10 +33,10 @@ const CreatePost = props => {
             name={'tags'}
             value={props.data.tags}
             placeholder={'TAGS'}
-            handleChange={props.handleChange.bind(null, 'createPost', 'tags')}
+            onChange={props.handleChange.bind(null, 'createPost', 'tags')}
           />
         </div>
-        <Input className="border-button" type="submit" />
+        <input className="border-button" type="submit" />
       </form>
     </Modal>
   );
@@ -51,11 +50,11 @@ CreatePost.propTypes = {
     show: PropTypes.bool.isRequired,
     file: PropTypes.shape({
       value: PropTypes.object.isRequired,
-      name: PropTypes.string.isRequired
+      name: PropTypes.string.isRequired,
     }),
     source: PropTypes.string.isRequired,
-    tags: PropTypes.string.isRequired
-  })
+    tags: PropTypes.string.isRequired,
+  }),
 };
 
 export default CreatePost;

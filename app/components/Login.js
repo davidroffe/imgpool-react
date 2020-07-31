@@ -4,25 +4,24 @@ import PropTypes from 'prop-types';
 import { setUser } from '../actions';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
-import Input from './Utility/Input';
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     email: state.user.email,
     username: state.user.username,
     password: state.user.password,
     passwordConfirm: state.user.passwordConfirm,
     userInit: state.user.init,
-    isLoggedIn: state.user.loggedIn
+    isLoggedIn: state.user.loggedIn,
   };
 };
 
-const Login = props => {
+const Login = (props) => {
   const [form, setForm] = useState('login');
   const [canSignUp, setCanSignUp] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/setting/signup').then(res => {
+    axios.get('/api/setting/signup').then((res) => {
       if (res.data) {
         setCanSignUp(res.data.signUp);
       }
@@ -39,12 +38,12 @@ const Login = props => {
     if (form === 'signUp') {
       window.grecaptcha.render('recaptcha', {
         sitekey: process.env.RECAPTCHA_KEY,
-        theme: 'dark'
+        theme: 'dark',
       });
     }
   }, [form]);
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     let recaptchaResponse = '';
@@ -83,7 +82,7 @@ const Login = props => {
       }
     }
     if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach(error => {
+      newErrorMessage.forEach((error) => {
         toast.error(error);
       });
     } else {
@@ -95,10 +94,10 @@ const Login = props => {
           username: username,
           password: password,
           passwordConfirm: passwordConfirm,
-          recaptchaResponse
-        }
+          recaptchaResponse,
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (form === 'forgotPassword') {
             toast.success('An email has been sent.');
           } else {
@@ -109,20 +108,20 @@ const Login = props => {
             props.history.push('/account');
           }
         })
-        .catch(error => {
+        .catch((error) => {
           toast.error(error.response.data);
         });
     }
   };
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const field = e.target.id;
     const value = e.target.value;
 
     props.dispatch(setUser(field, value));
   };
 
-  const switchForm = e => {
+  const switchForm = (e) => {
     e.preventDefault();
 
     if (e.target.id === 'forgot-password') {
@@ -138,7 +137,7 @@ const Login = props => {
       <div id="center-box">
         <form className="form-dark" onSubmit={handleSubmit}>
           <div className="field-container">
-            <Input
+            <input
               id="email"
               autoComplete={'off'}
               type={'text'}
@@ -146,10 +145,10 @@ const Login = props => {
               name={'email'}
               value={props.email}
               placeholder={'EMAIL'}
-              handleChange={handleChange}
+              onChange={handleChange}
             />
             {form === 'signUp' ? (
-              <Input
+              <input
                 id="username"
                 autoComplete={'off'}
                 type={'text'}
@@ -157,11 +156,11 @@ const Login = props => {
                 name={'username'}
                 value={props.username}
                 placeholder={'USERNAME'}
-                handleChange={handleChange}
+                onChange={handleChange}
               />
             ) : null}
             {form === 'signUp' || form === 'login' ? (
-              <Input
+              <input
                 id="password"
                 autoComplete={'off'}
                 type={'password'}
@@ -169,11 +168,11 @@ const Login = props => {
                 name={'password'}
                 value={props.password}
                 placeholder={'PASSWORD'}
-                handleChange={handleChange}
+                onChange={handleChange}
               />
             ) : null}
             {form === 'signUp' ? (
-              <Input
+              <input
                 id="passwordConfirm"
                 autoComplete={'off'}
                 type={'password'}
@@ -181,12 +180,12 @@ const Login = props => {
                 name={'password-confirm'}
                 value={props.passwordConfirm}
                 placeholder={'CONFIRM PASSWORD'}
-                handleChange={handleChange}
+                onChange={handleChange}
               />
             ) : null}
           </div>
           {form === 'signUp' ? <div id="recaptcha"></div> : null}
-          <Input
+          <input
             className="border-button"
             type="submit"
             value={(() => {
@@ -231,7 +230,7 @@ Login.propTypes = {
   password: PropTypes.string.isRequired,
   passwordConfirm: PropTypes.string.isRequired,
   userInit: PropTypes.bool.isRequired,
-  isLoggedIn: PropTypes.bool.isRequired
+  isLoggedIn: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps)(Login);
