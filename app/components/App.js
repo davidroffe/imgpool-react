@@ -3,11 +3,11 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect
+  Redirect,
 } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setPostsList } from '../actions';
+import { setPostsList, setTagMenu } from '../actions';
 import axios from 'axios';
 import Header from './Header';
 import AdminDashboard from './AdminDashboard';
@@ -23,11 +23,14 @@ import Login from './Login';
 import Auth from './Utility/Auth';
 import NotFound from './NotFound';
 
-const mapStateToProps = state => {
-  return { text: state.search };
+const mapStateToProps = (state) => {
+  return {
+    text: state.search,
+    showTagMenu: state.tagMenu,
+  };
 };
 
-const App = props => {
+const App = (props) => {
   const handleSearch = (e, history) => {
     e.preventDefault();
 
@@ -35,42 +38,51 @@ const App = props => {
 
     const url = searchQuery.length ? '/api/post/search' : '/api/post/list';
 
-    axios.get(url, { params: { searchQuery } }).then(res => {
+    axios.get(url, { params: { searchQuery } }).then((res) => {
       props.dispatch(setPostsList(res.data));
       history.push('/posts');
     });
   };
+
+  const handleClick = (e) => {
+    e.preventDefault();
+
+    if (props.showTagMenu) props.dispatch(setTagMenu(false));
+  };
   return (
-    <Router>
-      <Auth>
-        <Header>
-          <PostSearch handleSearch={handleSearch} />
-        </Header>
-        <Switch>
-          <Route path="/posts" exact component={PostList} />
-          <Route path="/post/:id" component={PostSingle} />
-          <Route path="/account" exact component={AccountDashboard} />
-          <Route
-            path="/password-reset/:passwordResetToken"
-            exact
-            component={PasswordReset}
-          />
-          <Route path="/admin" exact component={AdminDashboard} />
-          <Route path="/user/:id" exact component={UserProfile} />
-          <Route path="/flags" exact component={FlagList} />
-          <Route path="/about" exact component={About} />
-          <Route path="/login" exact component={Login} />
-          <Redirect from="/" exact to="/posts" />
-          <Route component={NotFound} />
-        </Switch>
-      </Auth>
-    </Router>
+    <div onClick={handleClick}>
+      <Router>
+        <Auth>
+          <Header>
+            <PostSearch handleSearch={handleSearch} />
+          </Header>
+          <Switch>
+            <Route path="/posts" exact component={PostList} />
+            <Route path="/post/:id" component={PostSingle} />
+            <Route path="/account" exact component={AccountDashboard} />
+            <Route
+              path="/password-reset/:passwordResetToken"
+              exact
+              component={PasswordReset}
+            />
+            <Route path="/admin" exact component={AdminDashboard} />
+            <Route path="/user/:id" exact component={UserProfile} />
+            <Route path="/flags" exact component={FlagList} />
+            <Route path="/about" exact component={About} />
+            <Route path="/login" exact component={Login} />
+            <Redirect from="/" exact to="/posts" />
+            <Route component={NotFound} />
+          </Switch>
+        </Auth>
+      </Router>
+    </div>
   );
 };
 
 App.propTypes = {
+  showTagMenu: PropTypes.bool.isRequired,
   text: PropTypes.string.isRequired,
-  dispatch: PropTypes.func.isRequired
+  dispatch: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps)(App);

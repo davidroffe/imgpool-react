@@ -32,7 +32,13 @@ const TagMenu = (props) => {
   };
 
   return (
-    <aside id="tag-menu" className={props.showMenu ? 'active' : ''}>
+    <aside
+      id="tag-menu"
+      className={props.showMenu ? 'active' : ''}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
       <div className="body">
         <nav>
           {props.tags.map((tag, index) => {
