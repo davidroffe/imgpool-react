@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setPostsList, setTagMenu } from '../actions';
+import { setPostsList, setMenu } from '../actions';
 import axios from 'axios';
 import Header from './Header';
 import AdminDashboard from './AdminDashboard';
@@ -26,7 +26,7 @@ import NotFound from './NotFound';
 const mapStateToProps = (state) => {
   return {
     text: state.search,
-    showTagMenu: state.tagMenu,
+    menus: state.menus,
   };
 };
 
@@ -47,7 +47,19 @@ const App = (props) => {
   const handleClick = (e) => {
     e.preventDefault();
 
-    if (props.showTagMenu) props.dispatch(setTagMenu(false));
+    for (const menu in props.menus) {
+      if (props.menus.hasOwnProperty(menu) && props.menus[menu]) {
+        props.dispatch(
+          setMenu(
+            `${menu.replace(
+              /[A-Z]/g,
+              (letter) => `_${letter.toLowerCase()}`
+            )}_MENU`,
+            false
+          )
+        );
+      }
+    }
   };
   return (
     <div onClick={handleClick}>
@@ -80,7 +92,7 @@ const App = (props) => {
 };
 
 App.propTypes = {
-  showTagMenu: PropTypes.bool.isRequired,
+  menus: PropTypes.object.isRequired,
   text: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
 };

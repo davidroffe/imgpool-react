@@ -5,7 +5,7 @@ import search from './search';
 import user from './user';
 import users from './users';
 import flags from './flags';
-import tagMenu from './tagMenu';
+import menus from './menus';
 
 export default combineReducers({
   posts,
@@ -14,5 +14,5 @@ export default combineReducers({
   user,
   users,
   flags,
-  tagMenu,
+  menus,
 });

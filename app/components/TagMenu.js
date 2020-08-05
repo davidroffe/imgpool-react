@@ -2,12 +2,12 @@ import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setPostsList, setSearch, setTagMenu } from '../actions';
+import { setPostsList, setSearch, setMenu } from '../actions';
 import axios from 'axios';
 
 const mapStateToProps = (state) => {
   return {
-    showMenu: state.tagMenu,
+    showMenu: state.menus.tags,
   };
 };
 
@@ -15,7 +15,7 @@ const TagMenu = (props) => {
   const toggleMenu = (e) => {
     e.preventDefault();
 
-    props.dispatch(setTagMenu(!props.showMenu));
+    props.dispatch(setMenu('TAGS_MENU', !props.showMenu));
   };
   const handleClick = (tag, e) => {
     e.preventDefault();
@@ -26,19 +26,13 @@ const TagMenu = (props) => {
     props.dispatch(setSearch(searchQuery));
     axios.get(url, { params: { searchQuery: searchQuery } }).then((res) => {
       props.dispatch(setPostsList(res.data));
-      props.dispatch(setTagMenu(!props.showMenu));
+      props.dispatch(setMenu('TAGS_MENU', !props.showMenu));
       props.history.push('/posts');
     });
   };
 
   return (
-    <aside
-      id="tag-menu"
-      className={props.showMenu ? 'active' : ''}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    >
+    <aside id="tag-menu" className={props.showMenu ? 'active' : ''}>
       <div className="body">
         <nav>
           {props.tags.map((tag, index) => {

@@ -33,8 +33,8 @@ export const setSearch = (text) => ({
   text,
 });
 
-export const setTagMenu = (state) => ({
-  type: 'SET_TAG_MENU',
+export const setMenu = (menu, state) => ({
+  type: `SET_${menu.toUpperCase()}`,
   state,
 });
 
