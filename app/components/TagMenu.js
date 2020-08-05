@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setPostsList, setSearch } from '../actions';
+import { setPostsList, setSearch, setTagMenu } from '../actions';
 import axios from 'axios';
 
-const TagMenu = props => {
-  const [showMenu, setShowMenu] = useState(false);
+const mapStateToProps = (state) => {
+  return {
+    showMenu: state.tagMenu,
+  };
+};
 
-  const toggleMenu = e => {
+const TagMenu = (props) => {
+  const toggleMenu = (e) => {
     e.preventDefault();
 
-    setShowMenu(!showMenu);
+    props.dispatch(setTagMenu(!props.showMenu));
   };
   const handleClick = (tag, e) => {
     e.preventDefault();
@@ -20,15 +24,15 @@ const TagMenu = props => {
     const url = '/api/post/search';
 
     props.dispatch(setSearch(searchQuery));
-    axios.get(url, { params: { searchQuery: searchQuery } }).then(res => {
+    axios.get(url, { params: { searchQuery: searchQuery } }).then((res) => {
       props.dispatch(setPostsList(res.data));
-      setShowMenu(!showMenu);
+      props.dispatch(setTagMenu(!props.showMenu));
       props.history.push('/posts');
     });
   };
 
   return (
-    <aside id="tag-menu" className={showMenu ? 'active' : ''}>
+    <aside id="tag-menu" className={props.showMenu ? 'active' : ''}>
       <div className="body">
         <nav>
           {props.tags.map((tag, index) => {
@@ -59,13 +63,10 @@ const TagMenu = props => {
 };
 
 TagMenu.propTypes = {
+  showMenu: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired,
-  tags: PropTypes.array.isRequired
+  tags: PropTypes.array.isRequired,
 };
 
-export default withRouter(
-  connect(() => {
-    return {};
-  })(TagMenu)
-);
+export default withRouter(connect(mapStateToProps)(TagMenu));
