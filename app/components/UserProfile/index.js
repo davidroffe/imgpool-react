@@ -1,39 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { setPosts, setSearch } from '../../actions';
+import { setPostsList, setSearch } from '../../actions';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
+import apiUtil from '../../utils/api';
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     loggedIn: state.user.loggedIn,
     admin: state.user.admin,
-    userInit: state.user.init
+    userInit: state.user.init,
   };
 };
 
-const Dashboard = props => {
+const Dashboard = (props) => {
   const [editAccount, setEditAccount] = useState({
     show: false,
     field: '',
     email: '',
     username: '',
-    bio: ''
+    bio: '',
   });
   const [user, setUser] = useState({
     username: '',
     email: '',
     joinDate: '',
     favorites: '',
-    bio: ''
+    bio: '',
   });
   useEffect(() => {
     axios
       .get(`/api/user/get/${props.match.params.id}`)
-      .then(res => {
+      .then((res) => {
         if (res.data.valid) {
           setUser({
             ...res.data,
@@ -41,8 +42,8 @@ const Dashboard = props => {
             joinDate: new Date(res.data.joinDate).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
-              day: 'numeric'
-            })
+              day: 'numeric',
+            }),
           });
         }
       })
@@ -56,7 +57,7 @@ const Dashboard = props => {
       username: '',
       bio: '',
       password: '',
-      passwordConfirm: ''
+      passwordConfirm: '',
     });
   };
   const handleChange = (form, field, e) => {
@@ -70,7 +71,7 @@ const Dashboard = props => {
         break;
     }
   };
-  const handleEditSubmit = e => {
+  const handleEditSubmit = (e) => {
     e.preventDefault();
 
     const url = `/api/user/edit/${user.id}`;
@@ -96,7 +97,7 @@ const Dashboard = props => {
       }
     }
     if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach(error => {
+      newErrorMessage.forEach((error) => {
         toast.error(error);
       });
     } else {
@@ -108,16 +109,16 @@ const Dashboard = props => {
           editField: editAccount.field,
           email: editAccount.email,
           username: editAccount.username,
-          bio: editAccount.bio
-        }
+          bio: editAccount.bio,
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res.data.status === 'success') {
             setUser({
               ...user,
               email: res.data.email,
               username: res.data.username,
-              bio: res.data.bio
+              bio: res.data.bio,
             });
 
             setEditAccount({
@@ -127,11 +128,11 @@ const Dashboard = props => {
               username: '',
               bio: '',
               password: '',
-              passwordConfirm: ''
+              passwordConfirm: '',
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           toast.error(error.response.data);
         });
     }
@@ -141,40 +142,38 @@ const Dashboard = props => {
     const url = `/api/user/password-reset/${user.id}`;
     axios({
       url: url,
-      method: 'post'
+      method: 'post',
     }).then(() => {});
   };
 
-  const handleToggleAccountSubmit = e => {
+  const handleToggleAccountSubmit = (e) => {
     e.preventDefault();
 
     const url = `/api/user/${user.active ? 'disable' : 'enable'}/${user.id}`;
 
     axios({
       url: url,
-      method: 'post'
+      method: 'post',
     })
-      .then(res => {
+      .then((res) => {
         setUser({
           ...user,
-          active: res.data.active
+          active: res.data.active,
         });
       })
-      .catch(error => {
+      .catch((error) => {
         toast.error(error.response.data);
       });
   };
 
-  const handleFavoritesClick = e => {
+  const handleFavoritesClick = (e) => {
     e.preventDefault();
 
-    const userId = user.id;
-    const searchQuery = `fp:${userId}`;
-    const url = '/api/post/search';
-
+    const searchQuery = `fp:${user.id}`;
     props.dispatch(setSearch(searchQuery));
-    axios.get(url, { params: { searchQuery: searchQuery } }).then(res => {
-      props.dispatch(setPosts(res.data));
+
+    apiUtil.search(searchQuery).then((res) => {
+      props.dispatch(setPostsList(res.data));
       props.history.push('/posts');
     });
   };
@@ -202,7 +201,7 @@ const Dashboard = props => {
                     setEditAccount({
                       ...editAccount,
                       show: true,
-                      field: 'edit-username'
+                      field: 'edit-username',
                     })
                   }
                 >
@@ -220,7 +219,7 @@ const Dashboard = props => {
                     setEditAccount({
                       ...editAccount,
                       show: true,
-                      field: 'edit-email'
+                      field: 'edit-email',
                     })
                   }
                 >
@@ -252,7 +251,7 @@ const Dashboard = props => {
                     setEditAccount({
                       ...editAccount,
                       show: true,
-                      field: 'edit-bio'
+                      field: 'edit-bio',
                     })
                   }
                 >
@@ -296,7 +295,7 @@ Dashboard.propTypes = {
   dispatch: PropTypes.func.isRequired,
   loggedIn: PropTypes.bool.isRequired,
   userInit: PropTypes.bool.isRequired,
-  admin: PropTypes.bool.isRequired
+  admin: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps)(Dashboard);
