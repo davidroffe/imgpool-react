@@ -11,7 +11,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const TagMenu = (props) => {
+export const TagMenu = (props) => {
   const toggleMenu = (e) => {
     e.preventDefault();
 
