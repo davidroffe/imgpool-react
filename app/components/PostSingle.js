@@ -1,60 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { setUser, setPostsList } from '../actions';
+import { setUser, setPostsList, setMenu } from '../actions';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import TagMenu from './TagMenu';
 import FlagPost from './FlagPost';
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     userId: state.user.id,
     isAdmin: state.user.admin,
-    userFavorites: state.user.favorites
+    userFavorites: state.user.favorites,
+    optionsMenu: state.menus.postOptions,
   };
 };
 
-const Single = props => {
+const Single = (props) => {
   const [post, setPost] = useState({
     id: props.match.params.id || '',
     tag: [],
     user: {
       id: '',
-      username: ''
-    }
+      username: '',
+    },
   });
-  const [optionsMenu, setOptionsMenu] = useState(false);
   const [flagPost, setFlagPost] = useState({
     show: false,
-    reason: ''
+    reason: '',
   });
   useEffect(() => {
     axios
       .get('/api/post/single', {
-        params: { id: post.id }
+        params: { id: post.id },
       })
-      .then(res => {
+      .then((res) => {
         setPost(res.data);
       })
       .catch(() => props.history.push('/404'));
   }, []);
 
-  const getTagsFromPosts = post => {
+  const getTagsFromPosts = (post) => {
     return post.tag;
   };
 
-  const toggleFavorite = e => {
+  const toggleFavorite = (e) => {
     e.preventDefault();
 
     axios({
       url: '/api/post/favorite',
       method: 'post',
       params: {
-        postId: post.id
-      }
-    }).then(res => {
+        postId: post.id,
+      },
+    }).then((res) => {
       toast.success(
         `Post ${isFavorited() ? 'removed from' : 'added to'} favorites.`
       );
@@ -62,10 +62,8 @@ const Single = props => {
     });
   };
 
-  const toggleOptionsMenu = e => {
-    e.stopPropagation();
-
-    setOptionsMenu(!optionsMenu);
+  const toggleOptionsMenu = () => {
+    props.dispatch(setMenu('POST_OPTIONS_MENU', !props.optionsMenu));
   };
 
   const isFavorited = () => {
@@ -75,31 +73,31 @@ const Single = props => {
     return false;
   };
 
-  const deletePost = e => {
+  const deletePost = (e) => {
     e.preventDefault();
 
     axios({
       url: `/api/post/delete/${post.id}`,
-      method: 'post'
+      method: 'post',
     })
       .then(() => {
         toast.success('Post deleted.');
         props.dispatch(setPostsList([]));
         props.history.push('/posts');
       })
-      .catch(error => {
+      .catch((error) => {
         toast.error(error.response.data);
       });
   };
 
-  const handleFlagPostChange = e => {
+  const handleFlagPostChange = (e) => {
     let newObject;
 
     newObject = { ...flagPost, reason: e.target.value };
     setFlagPost(newObject);
   };
 
-  const handleFlagPostSubmit = e => {
+  const handleFlagPostSubmit = (e) => {
     e.preventDefault();
 
     let newErrorMessage = [];
@@ -108,7 +106,7 @@ const Single = props => {
       newErrorMessage.push('Please enter a reason to flag this post.');
     }
     if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach(error => {
+      newErrorMessage.forEach((error) => {
         toast.error(error);
       });
     } else {
@@ -117,19 +115,19 @@ const Single = props => {
         method: 'post',
         params: {
           postId: post.id,
-          reason: flagPost.reason
-        }
+          reason: flagPost.reason,
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res.data.status === 'success') {
             setFlagPost({
               show: false,
-              reason: ''
+              reason: '',
             });
             toast.success('Post flagged.');
           }
         })
-        .catch(error => {
+        .catch((error) => {
           toast.error(error.response.data);
         });
     }
@@ -140,11 +138,7 @@ const Single = props => {
   };
 
   return (
-    <section
-      className="container"
-      id="post-single"
-      onClick={() => setOptionsMenu(false)}
-    >
+    <section className="container" id="post-single">
       <ToastContainer />
       <TagMenu tags={getTagsFromPosts(post)} />
       <div className="image-container">
@@ -153,7 +147,7 @@ const Single = props => {
             <button className="toggle-options" onClick={toggleOptionsMenu}>
               options <span>+</span>
             </button>
-            <ul className={`options${optionsMenu ? ' active' : ''}`}>
+            <ul className={`options${props.optionsMenu ? ' active' : ''}`}>
               <li>
                 <button
                   className={`toggle-fav${isFavorited() ? ' favorited' : ''}`}
@@ -210,7 +204,8 @@ Single.propTypes = {
   history: PropTypes.object.isRequired,
   userId: PropTypes.number.isRequired,
   isAdmin: PropTypes.bool.isRequired,
-  userFavorites: PropTypes.array.isRequired
+  userFavorites: PropTypes.array.isRequired,
+  optionsMenu: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps)(Single);

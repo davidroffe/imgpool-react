@@ -1,43 +1,48 @@
-export const setPosts = posts => ({
+export const setPosts = (posts) => ({
   type: 'SET_POSTS',
-  posts
+  posts,
 });
 
-export const setPostsList = posts => ({
+export const setPostsList = (posts) => ({
   type: 'SET_POSTS_LIST',
-  posts
+  posts,
 });
 
-export const setTags = tags => ({
+export const setTags = (tags) => ({
   type: 'SET_TAGS',
-  tags
+  tags,
 });
 
-export const setUsers = users => ({
+export const setUsers = (users) => ({
   type: 'SET_USERS',
-  users
+  users,
 });
 
-export const setFlags = flags => ({
+export const setFlags = (flags) => ({
   type: 'SET_FLAGS',
-  flags
+  flags,
 });
 
-export const toggleTag = tag => ({
+export const toggleTag = (tag) => ({
   type: 'TOGGLE_TAG',
-  id: tag.id
+  id: tag.id,
 });
 
-export const setSearch = text => ({
+export const setSearch = (text) => ({
   type: 'SET_SEARCH',
-  text
+  text,
+});
+
+export const setMenu = (menu, state) => ({
+  type: `SET_${menu.toUpperCase()}`,
+  state,
 });
 
 export const setUser = (field, value) => ({
   type: `SET_${field.toUpperCase()}`,
-  value
+  value,
 });
 
 export const clearUser = () => ({
-  type: 'CLEAR_USER'
+  type: 'CLEAR_USER',
 });

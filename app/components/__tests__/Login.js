@@ -3,11 +3,11 @@ import { shallow } from 'enzyme';
 import { Login } from '../Login';
 
 describe('Login', () => {
-  const mockHandleSubmit = jest.fn();
-  Login.prototype.handleSubmit = mockHandleSubmit;
+  const mockDispatch = jest.fn();
+  const mockSubmit = jest.fn();
   const props = {
     history: {},
-    dispatch: mockHandleSubmit,
+    dispatch: mockDispatch,
     email: '',
     username: '',
     password: '',
@@ -23,19 +23,25 @@ describe('Login', () => {
     emailInput.simulate('change', {
       target: { id: 'email', name: 'email', value: 'test@test.com' },
     });
-    expect(emailInput.props().name).toEqual('email');
+    expect(mockDispatch).toHaveBeenLastCalledWith({
+      type: 'SET_EMAIL',
+      value: 'test@test.com',
+    });
   });
 
   it('should update <input id="password" /> value', () => {
     const passwordInput = wrapper.find('#password').at(0);
     passwordInput.simulate('change', {
-      target: { id: 'password', name: 'password', value: 'testpassword' },
+      target: { id: 'password', name: 'password', value: 'testPassword' },
     });
-    expect(passwordInput.props().name).toEqual('password');
+    expect(mockDispatch).toHaveBeenLastCalledWith({
+      type: 'SET_PASSWORD',
+      value: 'testPassword',
+    });
   });
 
   it('should call handleSubmit on <form /> submit', () => {
-    loginForm.simulate('submit', { preventDefault: () => {} });
-    expect(mockHandleSubmit).toHaveBeenCalled();
+    loginForm.simulate('submit', { preventDefault: mockSubmit });
+    expect(mockSubmit).toHaveBeenCalled();
   });
 });
