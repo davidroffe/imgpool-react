@@ -24,9 +24,9 @@ import NotFound from './NotFound';
 import apiUtil from '../utils/api';
 
 const mapStateToProps = (state) => {
-  return { 
+  return {
     searchQuery: state.search,
-    menus: state.menus
+    menus: state.menus,
   };
 };
 
@@ -40,9 +40,7 @@ const App = (props) => {
     });
   };
 
-  const handleClick = (e) => {
-    e.preventDefault();
-
+  const handleClick = () => {
     for (const menu in props.menus) {
       if (props.menus.hasOwnProperty(menu) && props.menus[menu]) {
         props.dispatch(
