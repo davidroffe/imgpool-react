@@ -29,6 +29,7 @@ const Dashboard = (props) => {
     email: '',
     joinDate: '',
     favorites: '',
+    post: '',
     bio: '',
   });
   useEffect(() => {
@@ -178,6 +179,18 @@ const Dashboard = (props) => {
     });
   };
 
+  const handlePostsClick = (e) => {
+    e.preventDefault();
+
+    const searchQuery = `user:${user.id}`;
+    props.dispatch(setSearch(searchQuery));
+
+    apiUtil.search(searchQuery).then((res) => {
+      props.dispatch(setPostsList(res.data));
+      props.history.push('/posts');
+    });
+  };
+
   return (
     <section className="container dashboard" id="account-dashboard">
       <ToastContainer />
@@ -238,8 +251,18 @@ const Dashboard = (props) => {
             ) : null}
             <div className="row">
               <h2>Favorites</h2>
-              <p>{user.favorites.length} favorites</p>
+              <p>
+                {user.favorites.length}{' '}
+                {`favorite${user.favorites.length > 0 ? 's' : ''}`}
+              </p>
               <button onClick={handleFavoritesClick}>view</button>
+            </div>
+            <div className="row">
+              <h2>Posts</h2>
+              <p>
+                {user.post.length} {`post${user.post.length > 0 ? 's' : ''}`}
+              </p>
+              <button onClick={handlePostsClick}>view</button>
             </div>
             <div className="row">
               <h2>Bio</h2>
