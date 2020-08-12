@@ -7,6 +7,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import TagMenu from './TagMenu';
 import FlagPost from './FlagPost';
+import tagUtil from '../utils/tags';
 
 const mapStateToProps = (state) => {
   return {
@@ -37,13 +38,10 @@ const Single = (props) => {
       })
       .then((res) => {
         setPost(res.data);
+        props.dispatch(setTags(tagUtil.getTagsFromPosts([res.data])));
       })
       .catch(() => props.history.push('/404'));
   }, []);
-
-  const getTagsFromPosts = (post) => {
-    return post.tag;
-  };
 
   const toggleFavorite = (e) => {
     e.preventDefault();
@@ -141,7 +139,7 @@ const Single = (props) => {
   return (
     <section className="container" id="post-single">
       <ToastContainer />
-      <TagMenu tags={getTagsFromPosts(post)} />
+      <TagMenu />
       <div className="image-container">
         <div className="inner">
           <div className="post-info">
