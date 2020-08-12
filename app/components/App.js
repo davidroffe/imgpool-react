@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setPostsList, setMenu } from '../actions';
+import { setPostsList, setMenu, setTags } from '../actions';
 import Header from './Header';
 import AdminDashboard from './AdminDashboard';
 import AccountDashboard from './AccountDashboard';
@@ -22,6 +22,7 @@ import Login from './Login';
 import Auth from './Utility/Auth';
 import NotFound from './NotFound';
 import apiUtil from '../utils/api';
+import tagUtil from '../utils/tags';
 
 const mapStateToProps = (state) => {
   return {
@@ -36,6 +37,7 @@ const App = (props) => {
 
     apiUtil.search(props.searchQuery).then((res) => {
       props.dispatch(setPostsList(res.data));
+      props.dispatch(setTags(tagUtil.getTagsFromPosts(res.data)));
       history.push('/posts');
     });
   };

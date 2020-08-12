@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
-import { setFlags, setPostsList } from '../actions';
+import { setFlags, setPostsList, setTags } from '../actions';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -39,7 +39,7 @@ function stableSort(array, cmp) {
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-  return stabilizedThis.map(el => el[0]);
+  return stabilizedThis.map((el) => el[0]);
 }
 
 function getSorting(order, orderBy) {
@@ -53,17 +53,17 @@ const headCells = [
     id: 'postId',
     numeric: false,
     disablePadding: true,
-    label: 'Post'
+    label: 'Post',
   },
   { id: 'date', numeric: true, disablePadding: false, label: 'Date' },
   { id: 'user', numeric: true, disablePadding: false, label: 'User' },
   { id: 'status', numeric: true, disablePadding: false, label: 'Status' },
-  { id: 'reason', numeric: true, disablePadding: false, label: 'Reason' }
+  { id: 'reason', numeric: true, disablePadding: false, label: 'Reason' },
 ];
 
 function EnhancedTableHead(props) {
   const { classes, order, orderBy, onRequestSort } = props;
-  const createSortHandler = property => event => {
+  const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
 
@@ -71,7 +71,7 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox"></TableCell>
-        {headCells.map(headCell => (
+        {headCells.map((headCell) => (
           <TableCell
             className={classes.tablecell}
             key={headCell.id}
@@ -105,36 +105,36 @@ EnhancedTableHead.propTypes = {
   onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired
+  rowCount: PropTypes.number.isRequired,
 };
 
-const useToolbarStyles = makeStyles(theme => ({
+const useToolbarStyles = makeStyles((theme) => ({
   root: {
     paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(1)
+    paddingRight: theme.spacing(1),
   },
   highlight: {
     color: '#757575',
-    backgroundColor: lighten('#757575', 0.85)
+    backgroundColor: lighten('#757575', 0.85),
   },
   spacer: {
-    flex: '1 1 100%'
+    flex: '1 1 100%',
   },
   actions: {
-    color: '#757575'
+    color: '#757575',
   },
   title: {
-    flex: '0 0 auto'
-  }
+    flex: '0 0 auto',
+  },
 }));
 
 const useTooltipStyles = makeStyles(() => ({
   tooltip: {
-    fontSize: '1rem'
-  }
+    fontSize: '1rem',
+  },
 }));
 
-const EnhancedTableToolbar = props => {
+const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
   const tooltipClasses = useTooltipStyles();
   const { numSelected } = props;
@@ -142,7 +142,7 @@ const EnhancedTableToolbar = props => {
   return (
     <Toolbar
       className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0
+        [classes.highlight]: numSelected > 0,
       })}
     >
       <div className={classes.title}>
@@ -172,27 +172,27 @@ const EnhancedTableToolbar = props => {
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
-  handlePostDelete: PropTypes.func.isRequired
+  handlePostDelete: PropTypes.func.isRequired,
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   paper: {
     width: '100%',
     marginBottom: theme.spacing(2),
-    boxShadow: 'none'
+    boxShadow: 'none',
   },
   table: {
-    minWidth: 750
+    minWidth: 750,
   },
   tablecell: {
-    fontSize: '1.2rem'
+    fontSize: '1.2rem',
   },
   tableWrapper: {
-    overflowX: 'auto'
+    overflowX: 'auto',
   },
   visuallyHidden: {
     border: 0,
@@ -203,18 +203,18 @@ const useStyles = makeStyles(theme => ({
     padding: 0,
     position: 'absolute',
     top: 20,
-    width: 1
-  }
+    width: 1,
+  },
 }));
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     flags: state.flags,
-    isAdmin: state.user.admin
+    isAdmin: state.user.admin,
   };
 };
 
-const FlagList = props => {
+const FlagList = (props) => {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('date');
@@ -227,16 +227,16 @@ const FlagList = props => {
   }, []);
 
   const retrieveFlags = () => {
-    axios.get('/api/post/flag/list').then(res => {
+    axios.get('/api/post/flag/list').then((res) => {
       if (res.data.length) {
         props.dispatch(
           setFlags(
-            res.data.map(flag => {
+            res.data.map((flag) => {
               return {
                 ...flag,
                 date: new Date(flag.createdAt).toLocaleDateString(),
                 active: flag.post.active,
-                user: { id: flag.userId, username: flag.user.username }
+                user: { id: flag.userId, username: flag.user.username },
               };
             })
           )
@@ -245,21 +245,22 @@ const FlagList = props => {
     });
   };
 
-  const handlePostDelete = e => {
+  const handlePostDelete = (e) => {
     e.preventDefault();
     const selectedFlag = props.flags[selected];
 
     axios({
       url: `/api/post/delete/${selectedFlag.postId}`,
-      method: 'post'
+      method: 'post',
     })
       .then(() => {
         toast.success('Post deleted.');
         props.dispatch(setPostsList([]));
+        props.dispatch(setTags([]));
         setSelected([]);
         retrieveFlags();
       })
-      .catch(error => {
+      .catch((error) => {
         toast.error(error.response.data);
       });
   };
@@ -291,7 +292,7 @@ const FlagList = props => {
     setPage(newPage);
   };
 
-  const isSelected = name => selected.indexOf(name) !== -1;
+  const isSelected = (name) => selected.indexOf(name) !== -1;
 
   return (
     <section id="flag-list">
@@ -331,7 +332,7 @@ const FlagList = props => {
                     return (
                       <TableRow
                         hover
-                        onClick={event => handleClick(event, index)}
+                        onClick={(event) => handleClick(event, index)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
@@ -383,10 +384,10 @@ const FlagList = props => {
             rowsPerPage={rowsPerPage}
             page={page}
             backIconButtonProps={{
-              'aria-label': 'previous page'
+              'aria-label': 'previous page',
             }}
             nextIconButtonProps={{
-              'aria-label': 'next page'
+              'aria-label': 'next page',
             }}
             onChangePage={handleChangePage}
           />
@@ -399,7 +400,7 @@ const FlagList = props => {
 FlagList.propTypes = {
   dispatch: PropTypes.func.isRequired,
   flags: PropTypes.array.isRequired,
-  isAdmin: PropTypes.bool.isRequired
+  isAdmin: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps)(FlagList);
