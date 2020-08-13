@@ -11,12 +11,15 @@ const mapStateToProps = (state) => {
     showMenu: state.menus.tags,
     tags: state.tags,
     posts: state.posts.list,
+    searchQuery: state.search.split(' '),
   };
 };
 
 export const TagMenu = (props) => {
   React.useEffect(() => {
-    props.dispatch(setTags(tagUtil.getTagsFromPosts(props.posts)));
+    props.dispatch(
+      setTags(tagUtil.getTagsFromPosts(props.posts, props.searchQuery))
+    );
   }, [props.posts]);
   const toggleMenu = (e) => {
     e.preventDefault();
@@ -73,6 +76,7 @@ TagMenu.propTypes = {
   history: PropTypes.object.isRequired,
   tags: PropTypes.array.isRequired,
   posts: PropTypes.array.isRequired,
+  searchQuery: PropTypes.array.isRequired,
 };
 
 export default withRouter(connect(mapStateToProps)(TagMenu));

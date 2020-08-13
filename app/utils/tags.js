@@ -1,5 +1,5 @@
 export default {
-  getTagsFromPosts: (posts) => {
+  getTagsFromPosts: (posts, searchQuery) => {
     let newTags = [];
     let exists;
 
@@ -15,9 +15,11 @@ export default {
             }
           }
 
-          tag.active = false;
-
-          if (!exists) newTags.push(tag);
+          if (!exists) {
+            if (searchQuery !== undefined)
+              tag.active = searchQuery.indexOf(tag.name) > -1;
+            newTags.push(tag);
+          }
         }
       }
     }
