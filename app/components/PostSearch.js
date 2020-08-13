@@ -11,12 +11,16 @@ const mapStateToProps = (state) => {
 
 export const PostSearch = (props) => {
   const [searchField, setSearchField] = React.useState(props.searchQuery);
+  const [submitFlag, setSubmitFlag] = React.useState(false);
   React.useEffect(() => {
-    setSearchField(props.searchQuery);
-    handleSearch();
+    if (props.searchQuery !== searchField || submitFlag) {
+      setSearchField(props.searchQuery);
+      handleSearch();
+    }
   }, [props.searchQuery]);
   const handleSubmit = (e) => {
     e.preventDefault();
+    setSubmitFlag(true);
     props.dispatch(setSearch(searchField));
   };
   const handleSearch = () => {

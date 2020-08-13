@@ -32,15 +32,22 @@ const Single = (props) => {
     reason: '',
   });
   useEffect(() => {
+    let isMounted = true;
     axios
       .get('/api/post/single', {
         params: { id: post.id },
       })
       .then((res) => {
-        setPost(res.data);
-        props.dispatch(setTags(tagUtil.getTagsFromPosts([res.data])));
+        if (isMounted) {
+          setPost(res.data);
+          props.dispatch(setTags(tagUtil.getTagsFromPosts([res.data])));
+        }
       })
       .catch(() => props.history.push('/404'));
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const toggleFavorite = (e) => {
