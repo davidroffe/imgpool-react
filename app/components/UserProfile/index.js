@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { setPostsList, setSearch, setTags } from '../../actions';
+import { setPostsList, setSearch } from '../../actions';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
 import apiUtil from '../../utils/api';
-import tagUtil from '../../utils/tags';
 
 const mapStateToProps = (state) => {
   return {
@@ -176,7 +175,6 @@ const Dashboard = (props) => {
 
     apiUtil.search(searchQuery).then((res) => {
       props.dispatch(setPostsList(res.data));
-      props.dispatch(setTags(tagUtil.getTagsFromPosts(res.data)));
       props.history.push('/posts');
     });
   };
@@ -189,7 +187,6 @@ const Dashboard = (props) => {
 
     apiUtil.search(searchQuery).then((res) => {
       props.dispatch(setPostsList(res.data));
-      props.dispatch(setTags(tagUtil.getTagsFromPosts(res.data)));
       props.history.push('/posts');
     });
   };

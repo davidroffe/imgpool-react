@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import { setPosts, setTags } from '../actions';
+import { setPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
-import tagUtil from '../utils/tags';
 
 const mapStateToProps = (state) => {
   return {
@@ -37,7 +36,6 @@ const List = (props) => {
               : { list: [false], offset: props.posts.offset + res.data.length }
           )
         );
-        props.dispatch(setTags(tagUtil.getTagsFromPosts(newPostList)));
       });
   };
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setPostsList, setSearch, setMenu, setTags } from '../actions';
+import { setSearch, setMenu, setTags } from '../actions';
 import axios from 'axios';
 import tagUtil from '../utils/tags';
 
@@ -10,10 +10,14 @@ const mapStateToProps = (state) => {
   return {
     showMenu: state.menus.tags,
     tags: state.tags,
+    posts: state.posts.list,
   };
 };
 
 export const TagMenu = (props) => {
+  React.useEffect(() => {
+    props.dispatch(setTags(tagUtil.getTagsFromPosts(props.posts)));
+  }, [props.posts]);
   const toggleMenu = (e) => {
     e.preventDefault();
 
@@ -26,9 +30,7 @@ export const TagMenu = (props) => {
     const url = '/api/post/search';
 
     props.dispatch(setSearch(searchQuery));
-    axios.get(url, { params: { searchQuery: searchQuery } }).then((res) => {
-      props.dispatch(setPostsList(res.data));
-      props.dispatch(setTags(tagUtil.getTagsFromPosts(res.data)));
+    axios.get(url, { params: { searchQuery: searchQuery } }).then(() => {
       props.dispatch(setMenu('TAGS_MENU', !props.showMenu));
       props.history.push('/posts');
     });
@@ -70,6 +72,7 @@ TagMenu.propTypes = {
   dispatch: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired,
   tags: PropTypes.array.isRequired,
+  posts: PropTypes.array.isRequired,
 };
 
 export default withRouter(connect(mapStateToProps)(TagMenu));
