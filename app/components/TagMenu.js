@@ -29,11 +29,27 @@ export const TagMenu = (props) => {
   const handleClick = (tag, e) => {
     e.preventDefault();
 
-    const searchQuery = e.target.innerText;
+    const tagName = e.target.innerText.toLowerCase();
     const url = '/api/post/search';
+    const tagIndex = props.searchQuery.indexOf(tagName);
+    let newSearchQuery =
+      props.searchQuery.length === 1 && props.searchQuery[0] === ''
+        ? []
+        : [...props.searchQuery];
 
-    props.dispatch(setSearch(searchQuery));
-    axios.get(url, { params: { searchQuery: searchQuery } }).then(() => {
+    if (tagIndex > -1) {
+      newSearchQuery.splice(tagIndex, 1);
+
+      if (newSearchQuery.length === 0) newSearchQuery.push('');
+    } else {
+      newSearchQuery.push(tagName);
+    }
+
+    newSearchQuery =
+      newSearchQuery.length > 1 ? newSearchQuery.join(' ') : newSearchQuery[0];
+
+    props.dispatch(setSearch(newSearchQuery));
+    axios.get(url, { params: { searchQuery: newSearchQuery } }).then(() => {
       props.dispatch(setMenu('TAGS_MENU', !props.showMenu));
       props.history.push('/posts');
     });
