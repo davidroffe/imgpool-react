@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import axios from 'axios';
@@ -13,36 +13,37 @@ const mapStateToProps = (state) => {
 };
 
 const List = (props) => {
-  const [showLoadMore, setShowLoadMore] = useState(false);
   useEffect(() => {
-    setShowLoadMore(props.posts.list.length % 18 !== 0 ? false : true);
     if (!props.posts.list.length) {
-      retrievePosts();
+      retrievePosts(1);
     }
   });
 
-  const retrievePosts = () => {
-    axios
-      .get('/api/post/list', { params: { offset: props.posts.offset } })
-      .then((res) => {
-        const newPostList = [...props.posts.list, ...res.data];
-        props.dispatch(
-          setPosts(
-            res.data.length
-              ? {
-                  list: newPostList,
-                  offset: props.posts.offset + res.data.length,
-                }
-              : { list: [false], offset: props.posts.offset + res.data.length }
-          )
-        );
-      });
+  const retrievePosts = (nextPage) => {
+    axios.get('/api/post/list', { params: { page: nextPage } }).then((res) => {
+      props.dispatch(
+        setPosts(
+          res.data.length
+            ? {
+                list: res.data,
+                page: nextPage,
+              }
+            : { list: [false], page: nextPage }
+        )
+      );
+    });
   };
 
-  const loadMorePosts = (e) => {
+  const changePage = (page, e) => {
     e.preventDefault();
 
-    retrievePosts();
+    if (page === 'next') {
+      page = props.posts.page + 1;
+    } else if (page === 'prev') {
+      page = props.posts.page - 1;
+    }
+
+    retrievePosts(page);
   };
 
   if (!props.posts.list[0]) {
@@ -69,17 +70,17 @@ const List = (props) => {
             </Link>
           );
         })}
-        <div id="load-more-container">
-          {showLoadMore ? (
-            <button
-              className="border-button"
-              id="load-more"
-              onClick={loadMorePosts}
-            >
-              Load More
-            </button>
-          ) : null}
-        </div>
+        <aside className="paginator">
+          <button className="previous" onClick={changePage.bind(null, 'prev')}>
+            ←
+          </button>
+          <button className="number" onClick={changePage.bind(null, 1)}>
+            {props.posts.page}
+          </button>
+          <button className="next" onClick={changePage.bind(null, 'next')}>
+            →
+          </button>
+        </aside>
       </section>
     );
   }

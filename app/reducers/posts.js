@@ -1,4 +1,4 @@
-const posts = (state = { list: [], offset: 0 }, action) => {
+const posts = (state = { list: [], page: 1 }, action) => {
   switch (action.type) {
     case 'SET_POSTS':
       return action.posts;
