@@ -97,7 +97,7 @@ const List = (props) => {
                 <button
                   key={i}
                   className="number"
-                  onClick={changePage.bind(null, props.posts.page)}
+                  onClick={changePage.bind(null, pageLink)}
                 >
                   {pageLink}
                 </button>
