@@ -24,9 +24,17 @@ export const PostSearch = (props) => {
     props.dispatch(setSearch(searchField));
   };
   const handleSearch = () => {
-    apiUtil.search(props.searchQuery).then((res) => {
+    apiUtil.search(props.searchQuery, 1).then((res) => {
       props.dispatch(
-        setPosts({ list: res.data, page: 1, count: res.data.totalCount })
+        setPosts(
+          res.data.list.length
+            ? {
+                list: res.data.list,
+                page: 1,
+                totalCount: res.data.totalCount,
+              }
+            : { list: [false], page: 1, totalCount: 0 }
+        )
       );
       props.history.push('/posts');
     });

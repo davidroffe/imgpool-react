@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import axios from 'axios';
 import { setPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
+import apiUtil from '../utils/api';
 
 const mapStateToProps = (state) => {
   return {
     posts: state.posts,
+    searchQuery: state.search,
   };
 };
 
@@ -20,11 +21,11 @@ const List = (props) => {
     if (!props.posts.list.length) {
       retrievePosts(props.posts.page);
     }
+    setLastPage(Math.ceil(props.posts.totalCount / 18));
   }, [props.posts]);
 
   const retrievePosts = (nextPage) => {
-    axios.get('/api/post/list', { params: { page: nextPage } }).then((res) => {
-      setLastPage(Math.ceil(res.data.totalCount / 18));
+    apiUtil.search(props.searchQuery, nextPage).then((res) => {
       props.dispatch(
         setPosts(
           res.data.list.length
