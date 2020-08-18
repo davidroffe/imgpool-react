@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { setPostsList, setSearch } from '../../actions';
+import { setPosts, setSearch } from '../../actions';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -174,7 +174,9 @@ const Dashboard = (props) => {
     props.dispatch(setSearch(searchQuery));
 
     apiUtil.search(searchQuery).then((res) => {
-      props.dispatch(setPostsList(res.data));
+      props.dispatch(
+        setPosts({ list: res.data, page: 1, totalCount: res.data.totalCount })
+      );
       props.history.push('/posts');
     });
   };
@@ -186,7 +188,9 @@ const Dashboard = (props) => {
     props.dispatch(setSearch(searchQuery));
 
     apiUtil.search(searchQuery).then((res) => {
-      props.dispatch(setPostsList(res.data));
+      props.dispatch(
+        setPosts({ list: res.data, page: 1, totalCount: res.data.totalCount })
+      );
       props.history.push('/posts');
     });
   };

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import axios from 'axios';
@@ -13,22 +13,27 @@ const mapStateToProps = (state) => {
 };
 
 const List = (props) => {
+  const [lastPage, setLastPage] = useState(
+    Math.ceil(props.posts.totalCount / 18)
+  );
   useEffect(() => {
     if (!props.posts.list.length) {
-      retrievePosts(1);
+      retrievePosts(props.posts.page);
     }
-  });
+  }, [props.posts]);
 
   const retrievePosts = (nextPage) => {
     axios.get('/api/post/list', { params: { page: nextPage } }).then((res) => {
+      setLastPage(Math.ceil(res.data.totalCount / 18));
       props.dispatch(
         setPosts(
-          res.data.length
+          res.data.list.length
             ? {
-                list: res.data,
+                list: res.data.list,
                 page: nextPage,
+                totalCount: res.data.totalCount,
               }
-            : { list: [false], page: nextPage }
+            : { list: [false], page: 1, totalCount: 0 }
         )
       );
     });
@@ -71,13 +76,68 @@ const List = (props) => {
           );
         })}
         <aside className="paginator">
-          <button className="previous" onClick={changePage.bind(null, 'prev')}>
+          <button
+            className="previous"
+            disabled={props.posts.page < 2}
+            onClick={changePage.bind(null, 'prev')}
+          >
             ←
           </button>
-          <button className="number" onClick={changePage.bind(null, 1)}>
+          {props.posts.page >= 6 ? (
+            <button className="number" onClick={changePage.bind(null, 1)}>
+              1
+            </button>
+          ) : null}
+
+          {[...Array(5)].map((el, i) => {
+            const pageLink = props.posts.page - (i + 1);
+
+            if (pageLink > 0) {
+              return (
+                <button
+                  key={i}
+                  className="number"
+                  onClick={changePage.bind(null, props.posts.page)}
+                >
+                  {pageLink}
+                </button>
+              );
+            }
+          })}
+          <button
+            className="number active"
+            onClick={changePage.bind(null, props.posts.page)}
+          >
             {props.posts.page}
           </button>
-          <button className="next" onClick={changePage.bind(null, 'next')}>
+          {[...Array(5)].map((el, i) => {
+            const pageLink = props.posts.page + (i + 1);
+
+            if (pageLink <= lastPage) {
+              return (
+                <button
+                  key={i}
+                  className="number"
+                  onClick={changePage.bind(null, pageLink)}
+                >
+                  {pageLink}
+                </button>
+              );
+            }
+          })}
+          {props.posts.page <= lastPage - 6 ? (
+            <button
+              className="number"
+              onClick={changePage.bind(null, lastPage)}
+            >
+              {lastPage}
+            </button>
+          ) : null}
+          <button
+            className="next"
+            disabled={lastPage === props.posts.page}
+            onClick={changePage.bind(null, 'next')}
+          >
             →
           </button>
         </aside>

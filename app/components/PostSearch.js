@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { setSearch, setPostsList } from '../actions';
+import { setSearch, setPosts } from '../actions';
 import apiUtil from '../utils/api';
 
 const mapStateToProps = (state) => {
@@ -25,7 +25,9 @@ export const PostSearch = (props) => {
   };
   const handleSearch = () => {
     apiUtil.search(props.searchQuery).then((res) => {
-      props.dispatch(setPostsList(res.data));
+      props.dispatch(
+        setPosts({ list: res.data, page: 1, count: res.data.totalCount })
+      );
       props.history.push('/posts');
     });
   };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { setUser, setPostsList, setMenu, setTags } from '../actions';
+import { setUser, setPosts, setMenu, setTags } from '../actions';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -87,7 +87,7 @@ const Single = (props) => {
     })
       .then(() => {
         toast.success('Post deleted.');
-        props.dispatch(setPostsList([]));
+        props.dispatch(setPosts({ posts: [], page: 1, totalCount: 0 }));
         props.dispatch(setTags([]));
         props.history.push('/posts');
       })

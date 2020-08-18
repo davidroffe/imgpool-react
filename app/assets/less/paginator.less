@@ -12,11 +12,22 @@
   button {
     background: none;
     border: none;
+    margin: 20px 0;
     font-size: 2rem;
     transform: rotate(90deg);
     outline: none;
+    z-index: 1;
     &:hover {
       cursor: pointer;
     }
+    &.active {
+      font-size: 3rem;
+    }
+  }
+
+  .page-indicator {
+    font-size: 2rem;
+    text-align: center;
+    transform: rotate(90deg);
   }
 }
