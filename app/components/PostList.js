@@ -1,48 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import axios from 'axios';
 import { setPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
+import apiUtil from '../utils/api';
 
 const mapStateToProps = (state) => {
   return {
     posts: state.posts,
+    searchQuery: state.search,
   };
 };
 
 const List = (props) => {
-  const [showLoadMore, setShowLoadMore] = useState(false);
+  const [lastPage, setLastPage] = useState(
+    Math.ceil(props.posts.totalCount / 18)
+  );
   useEffect(() => {
-    setShowLoadMore(props.posts.list.length % 18 !== 0 ? false : true);
     if (!props.posts.list.length) {
-      retrievePosts();
+      retrievePosts(props.posts.page);
     }
-  });
+    setLastPage(Math.ceil(props.posts.totalCount / 18));
+  }, [props.posts]);
 
-  const retrievePosts = () => {
-    axios
-      .get('/api/post/list', { params: { offset: props.posts.offset } })
-      .then((res) => {
-        const newPostList = [...props.posts.list, ...res.data];
-        props.dispatch(
-          setPosts(
-            res.data.length
-              ? {
-                  list: newPostList,
-                  offset: props.posts.offset + res.data.length,
-                }
-              : { list: [false], offset: props.posts.offset + res.data.length }
-          )
-        );
-      });
+  const retrievePosts = (nextPage) => {
+    apiUtil.search(props.searchQuery, nextPage).then((res) => {
+      props.dispatch(
+        setPosts(
+          res.data.list.length
+            ? {
+                list: res.data.list,
+                page: nextPage,
+                totalCount: res.data.totalCount,
+              }
+            : { list: [false], page: 1, totalCount: 0 }
+        )
+      );
+    });
   };
 
-  const loadMorePosts = (e) => {
+  const changePage = (page, e) => {
     e.preventDefault();
 
-    retrievePosts();
+    if (page === 'next') {
+      page = props.posts.page + 1;
+    } else if (page === 'prev') {
+      page = props.posts.page - 1;
+    }
+
+    retrievePosts(page);
   };
 
   if (!props.posts.list[0]) {
@@ -69,17 +76,72 @@ const List = (props) => {
             </Link>
           );
         })}
-        <div id="load-more-container">
-          {showLoadMore ? (
-            <button
-              className="border-button"
-              id="load-more"
-              onClick={loadMorePosts}
-            >
-              Load More
+        <aside className="paginator">
+          <button
+            className="previous"
+            disabled={props.posts.page < 2}
+            onClick={changePage.bind(null, 'prev')}
+          >
+            ←
+          </button>
+          {props.posts.page >= 6 ? (
+            <button className="number" onClick={changePage.bind(null, 1)}>
+              1
             </button>
           ) : null}
-        </div>
+
+          {[...Array(5)].map((el, i) => {
+            const pageLink = props.posts.page - (i + 1);
+
+            if (pageLink > 0) {
+              return (
+                <button
+                  key={i}
+                  className="number"
+                  onClick={changePage.bind(null, pageLink)}
+                >
+                  {pageLink}
+                </button>
+              );
+            }
+          })}
+          <button
+            className="number active"
+            onClick={changePage.bind(null, props.posts.page)}
+          >
+            {props.posts.page}
+          </button>
+          {[...Array(5)].map((el, i) => {
+            const pageLink = props.posts.page + (i + 1);
+
+            if (pageLink <= lastPage) {
+              return (
+                <button
+                  key={i}
+                  className="number"
+                  onClick={changePage.bind(null, pageLink)}
+                >
+                  {pageLink}
+                </button>
+              );
+            }
+          })}
+          {props.posts.page <= lastPage - 6 ? (
+            <button
+              className="number"
+              onClick={changePage.bind(null, lastPage)}
+            >
+              {lastPage}
+            </button>
+          ) : null}
+          <button
+            className="next"
+            disabled={lastPage === props.posts.page}
+            onClick={changePage.bind(null, 'next')}
+          >
+            →
+          </button>
+        </aside>
       </section>
     );
   }

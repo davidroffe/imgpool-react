@@ -8,17 +8,17 @@ import CreatePost from './CreatePost';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     email: state.user.email,
     username: state.user.username,
     bio: state.user.bio,
     loggedIn: state.user.loggedIn,
-    userInit: state.user.init
+    userInit: state.user.init,
   };
 };
 
-const Dashboard = props => {
+const Dashboard = (props) => {
   const [editAccount, setEditAccount] = useState({
     show: false,
     field: '',
@@ -26,13 +26,13 @@ const Dashboard = props => {
     username: '',
     password: '',
     passwordConfirm: '',
-    bio: ''
+    bio: '',
   });
   const [createPost, setCreatePost] = useState({
     show: false,
     file: { value: {}, name: '' },
     source: '',
-    tags: ''
+    tags: '',
   });
   useEffect(() => {
     if (props.userInit) {
@@ -43,7 +43,7 @@ const Dashboard = props => {
       }
     }
   }, [props]);
-  const logout = e => {
+  const logout = (e) => {
     e.preventDefault();
 
     axios.post('/api/user/logout').then(() => {
@@ -58,13 +58,13 @@ const Dashboard = props => {
       username: '',
       bio: props.bio,
       password: '',
-      passwordConfirm: ''
+      passwordConfirm: '',
     });
     setCreatePost({
       show: false,
       file: { value: {}, name: '' },
       source: '',
-      tags: ''
+      tags: '',
     });
   };
   const handleChange = (form, field, e) => {
@@ -88,7 +88,7 @@ const Dashboard = props => {
         break;
     }
   };
-  const handleEditSubmit = e => {
+  const handleEditSubmit = (e) => {
     e.preventDefault();
 
     const url = '/api/user/edit';
@@ -123,7 +123,7 @@ const Dashboard = props => {
       }
     }
     if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach(error => {
+      newErrorMessage.forEach((error) => {
         toast.error(error);
       });
     } else {
@@ -137,10 +137,10 @@ const Dashboard = props => {
           username: editAccount.username,
           bio: editAccount.bio,
           password: editAccount.password,
-          passwordConfirm: editAccount.passwordConfirm
-        }
+          passwordConfirm: editAccount.passwordConfirm,
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res.data.status === 'success') {
             props.dispatch(setUser('email', res.data.email));
             props.dispatch(setUser('username', res.data.username));
@@ -153,25 +153,25 @@ const Dashboard = props => {
               username: '',
               bio: res.data.bio,
               password: '',
-              passwordConfirm: ''
+              passwordConfirm: '',
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           toast.error(error.response.data);
         });
     }
   };
 
-  const handleCreatePostSubmit = e => {
+  const handleCreatePostSubmit = (e) => {
     e.preventDefault();
 
     const url = '/api/post/create';
     let formData = new FormData();
     const config = {
       headers: {
-        'content-type': 'multipart/form-data'
-      }
+        'content-type': 'multipart/form-data',
+      },
     };
     let newErrorMessage = [];
 
@@ -184,24 +184,24 @@ const Dashboard = props => {
       );
     }
     if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach(error => {
+      newErrorMessage.forEach((error) => {
         toast.error(error);
       });
     } else {
       config.params = {
         source: createPost.source,
-        tags: createPost.tags
+        tags: createPost.tags,
       };
       formData.append('image', createPost.file.value);
       axios
         .post(url, formData, config)
-        .then(res => {
+        .then((res) => {
           if (res.data.status === 'success') {
             clearValues();
-            props.dispatch(setPosts({ list: [], offset: 0 }));
+            props.dispatch(setPosts({ list: [], page: 1, totalCount: 0 }));
           }
         })
-        .catch(error => {
+        .catch((error) => {
           toast.error(error.response.data);
         });
     }
@@ -224,7 +224,7 @@ const Dashboard = props => {
                   setEditAccount({
                     ...editAccount,
                     show: true,
-                    field: 'edit-username'
+                    field: 'edit-username',
                   })
                 }
               >
@@ -240,7 +240,7 @@ const Dashboard = props => {
                   setEditAccount({
                     ...editAccount,
                     show: true,
-                    field: 'edit-email'
+                    field: 'edit-email',
                   })
                 }
               >
@@ -256,7 +256,7 @@ const Dashboard = props => {
                   setEditAccount({
                     ...editAccount,
                     show: true,
-                    field: 'edit-password'
+                    field: 'edit-password',
                   })
                 }
               >
@@ -272,7 +272,7 @@ const Dashboard = props => {
                   setEditAccount({
                     ...editAccount,
                     show: true,
-                    field: 'edit-bio'
+                    field: 'edit-bio',
                   })
                 }
               >
@@ -287,7 +287,7 @@ const Dashboard = props => {
               onClick={() =>
                 setCreatePost({
                   ...createPost,
-                  show: true
+                  show: true,
                 })
               }
             >
@@ -325,7 +325,7 @@ Dashboard.propTypes = {
   userInit: PropTypes.bool.isRequired,
   email: PropTypes.string.isRequired,
   username: PropTypes.string.isRequired,
-  bio: PropTypes.string.isRequired
+  bio: PropTypes.string.isRequired,
 };
 
 export default connect(mapStateToProps)(Dashboard);

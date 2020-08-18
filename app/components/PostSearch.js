@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { setSearch, setPostsList } from '../actions';
+import { setSearch, setPosts } from '../actions';
 import apiUtil from '../utils/api';
 
 const mapStateToProps = (state) => {
@@ -24,8 +24,18 @@ export const PostSearch = (props) => {
     props.dispatch(setSearch(searchField));
   };
   const handleSearch = () => {
-    apiUtil.search(props.searchQuery).then((res) => {
-      props.dispatch(setPostsList(res.data));
+    apiUtil.search(props.searchQuery, 1).then((res) => {
+      props.dispatch(
+        setPosts(
+          res.data.list.length
+            ? {
+                list: res.data.list,
+                page: 1,
+                totalCount: res.data.totalCount,
+              }
+            : { list: [false], page: 1, totalCount: 0 }
+        )
+      );
       props.history.push('/posts');
     });
   };
