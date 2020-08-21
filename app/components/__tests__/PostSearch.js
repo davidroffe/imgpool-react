@@ -4,12 +4,13 @@ import { PostSearch } from '../PostSearch';
 
 describe('PostSearch', () => {
   var wrapper;
+  const mockHandleChange = jest.fn();
   const mockHandleSubmit = jest.fn();
 
   beforeEach(() => {
     wrapper = shallow(
       <PostSearch
-        text={''}
+        searchQuery={''}
         history={{}}
         dispatch={() => {}}
         handleSearch={mockHandleSubmit}
@@ -18,12 +19,16 @@ describe('PostSearch', () => {
   });
 
   it('should update <input /> value', () => {
-    wrapper.setProps({ text: 'search_tag' });
-    expect(wrapper.find('.search-field').props().value).toEqual('search_tag');
+    const searchField = wrapper.find('.search-field').at(0);
+    searchField.simulate('change', {
+      preventDefault: mockHandleChange,
+      target: { value: '' },
+    });
+    expect(mockHandleChange.mock.calls.length).toEqual(1);
   });
 
   it('should call handleSearch on <form /> submit', () => {
-    wrapper.simulate('submit');
+    wrapper.simulate('submit', { preventDefault: mockHandleSubmit });
     expect(mockHandleSubmit.mock.calls.length).toEqual(1);
   });
 });

@@ -9,6 +9,8 @@ describe('TagMenu', () => {
     dispatch: mockDispatch,
     showMenu: false,
     tags: [{ id: 0, active: false, name: 'test_tag' }],
+    posts: [],
+    searchQuery: [''],
   };
   const wrapper = shallow(<TagMenu {...props} />);
 
