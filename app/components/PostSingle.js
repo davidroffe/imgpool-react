@@ -150,42 +150,48 @@ const Single = (props) => {
       <div className="image-container">
         <div className="inner">
           <div className="post-info">
-            <button className="toggle-options" onClick={toggleOptionsMenu}>
-              options <span>+</span>
-            </button>
-            <ul className={`options${props.optionsMenu ? ' active' : ''}`}>
-              <li>
-                <button
-                  className={`toggle-fav${isFavorited() ? ' favorited' : ''}`}
-                  onClick={toggleFavorite}
-                >
-                  <span className="icon">&hearts;</span>
-                  <span className="text add">add to favorites</span>
-                  <span className="text remove">remove from favorites</span>
+            {props.userId ? (
+              <div>
+                <button className="toggle-options" onClick={toggleOptionsMenu}>
+                  options <span>+</span>
                 </button>
-              </li>
-              {props.userId ? (
-                <li>
-                  <button
-                    className="flag-post"
-                    onClick={() => {
-                      setFlagPost({ ...flagPost, show: true });
-                    }}
-                  >
-                    <span className="icon flag">&#9873;</span>
-                    <span className="text">flag post</span>
-                  </button>
-                </li>
-              ) : null}
-              {post.userId === props.userId || props.isAdmin ? (
-                <li>
-                  <button className="delete-post" onClick={deletePost}>
-                    <span className="icon x">×</span>
-                    <span className="text">delete post</span>
-                  </button>
-                </li>
-              ) : null}
-            </ul>
+                <ul className={`options${props.optionsMenu ? ' active' : ''}`}>
+                  <li>
+                    <button
+                      className={`toggle-fav${
+                        isFavorited() ? ' favorited' : ''
+                      }`}
+                      onClick={toggleFavorite}
+                    >
+                      <span className="icon">&hearts;</span>
+                      <span className="text add">add to favorites</span>
+                      <span className="text remove">remove from favorites</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="flag-post"
+                      onClick={() => {
+                        setFlagPost({ ...flagPost, show: true });
+                      }}
+                    >
+                      <span className="icon flag">&#9873;</span>
+                      <span className="text">flag post</span>
+                    </button>
+                  </li>
+                  {post.userId === props.userId || props.isAdmin ? (
+                    <li>
+                      <button className="delete-post" onClick={deletePost}>
+                        <span className="icon x">×</span>
+                        <span className="text">delete post</span>
+                      </button>
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            ) : (
+              <div></div>
+            )}
             <p className="poster">
               posted by:{' '}
               <Link to={`/user/${post.user.id}`}>{post.user.username}</Link>

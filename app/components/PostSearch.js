@@ -40,6 +40,7 @@ export const PostSearch = (props) => {
     });
   };
   const handleChange = (e) => {
+    e.preventDefault();
     setSearchField(e.target.value.toLowerCase());
   };
   return (
