@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { setUser, setPosts, setMenu, setTags } from '../actions';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import TagMenu from './TagMenu';
 import FlagPost from './FlagPost';
@@ -32,15 +31,17 @@ const Single = (props) => {
     reason: '',
   });
   useEffect(() => {
+    const url = '/api/post/single';
+    const urlSearchParams = new URLSearchParams({ id: post.id });
     let isMounted = true;
-    axios
-      .get('/api/post/single', {
-        params: { id: post.id },
-      })
+    fetch(`${url}?${urlSearchParams}`, {
+      method: 'GET',
+    })
+      .then((res) => res.json())
       .then((res) => {
         if (isMounted) {
-          setPost(res.data);
-          props.dispatch(setTags(tagUtil.getTagsFromPosts([res.data])));
+          setPost(res);
+          props.dispatch(setTags(tagUtil.getTagsFromPosts([res])));
         }
       })
       .catch(() => props.history.push('/404'));
@@ -52,19 +53,19 @@ const Single = (props) => {
 
   const toggleFavorite = (e) => {
     e.preventDefault();
+    const url = '/api/post/favorite';
+    const urlSearchParams = new URLSearchParams({ postId: post.id });
 
-    axios({
-      url: '/api/post/favorite',
-      method: 'post',
-      params: {
-        postId: post.id,
-      },
-    }).then((res) => {
-      toast.success(
-        `Post ${isFavorited() ? 'removed from' : 'added to'} favorites.`
-      );
-      props.dispatch(setUser('favorites', res.data.favorites));
-    });
+    fetch(`${url}?${urlSearchParams}`, {
+      method: 'POST',
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        toast.success(
+          `Post ${isFavorited() ? 'removed from' : 'added to'} favorites.`
+        );
+        props.dispatch(setUser('favorites', res.favorites));
+      });
   };
 
   const toggleOptionsMenu = () => {
@@ -80,10 +81,10 @@ const Single = (props) => {
 
   const deletePost = (e) => {
     e.preventDefault();
+    const url = `/api/post/delete/${post.id}`;
 
-    axios({
-      url: `/api/post/delete/${post.id}`,
-      method: 'post',
+    fetch(url, {
+      method: 'POST',
     })
       .then(() => {
         toast.success('Post deleted.');
@@ -92,7 +93,7 @@ const Single = (props) => {
         props.history.push('/posts');
       })
       .catch((error) => {
-        toast.error(error.response.data);
+        toast.error(error);
       });
   };
 
@@ -116,16 +117,18 @@ const Single = (props) => {
         toast.error(error);
       });
     } else {
-      axios({
-        url: '/api/post/flag/create',
-        method: 'post',
-        params: {
-          postId: post.id,
-          reason: flagPost.reason,
-        },
+      const url = '/api/post/flag/create';
+      const urlSearchParams = new URLSearchParams({
+        postId: post.id,
+        reason: flagPost.reason,
+      });
+
+      fetch(`${url}?${urlSearchParams}`, {
+        method: 'POST',
       })
+        .then((res) => res.json())
         .then((res) => {
-          if (res.data.status === 'success') {
+          if (res.status === 'success') {
             setFlagPost({
               show: false,
               reason: '',
@@ -134,7 +137,7 @@ const Single = (props) => {
           }
         })
         .catch((error) => {
-          toast.error(error.response.data);
+          toast.error(error);
         });
     }
   };

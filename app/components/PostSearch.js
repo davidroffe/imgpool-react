@@ -27,11 +27,11 @@ export const PostSearch = (props) => {
     apiUtil.search(props.searchQuery, 1).then((res) => {
       props.dispatch(
         setPosts(
-          res.data.list.length
+          res.list.length
             ? {
-                list: res.data.list,
+                list: res.list,
                 page: 1,
-                totalCount: res.data.totalCount,
+                totalCount: res.totalCount,
               }
             : { list: [false], page: 1, totalCount: 0 }
         )

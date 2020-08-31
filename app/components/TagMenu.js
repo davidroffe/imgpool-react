@@ -3,7 +3,6 @@ import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { setSearch, setMenu, setTags } from '../actions';
-import axios from 'axios';
 import tagUtil from '../utils/tags';
 
 const mapStateToProps = (state) => {
@@ -30,7 +29,6 @@ export const TagMenu = (props) => {
     e.preventDefault();
 
     const tagName = e.target.innerText.toLowerCase();
-    const url = '/api/post/search';
     const tagIndex = props.searchQuery.indexOf(tagName);
     let newSearchQuery =
       props.searchQuery.length === 1 && props.searchQuery[0] === ''
@@ -49,10 +47,6 @@ export const TagMenu = (props) => {
       newSearchQuery.length > 1 ? newSearchQuery.join(' ') : newSearchQuery[0];
 
     props.dispatch(setSearch(newSearchQuery));
-    axios.get(url, { params: { searchQuery: newSearchQuery } }).then(() => {
-      props.dispatch(setMenu('TAGS_MENU', !props.showMenu));
-      props.history.push('/posts');
-    });
   };
 
   return (

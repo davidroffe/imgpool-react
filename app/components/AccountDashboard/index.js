@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { setUser, setPosts } from '../../actions';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import CreatePost from './CreatePost';
 import EditAccount from './EditAccount';
@@ -46,7 +45,7 @@ const Dashboard = (props) => {
   const logout = (e) => {
     e.preventDefault();
 
-    axios.post('/api/user/logout').then(() => {
+    fetch('/api/user/logout', { method: 'POST' }).then(() => {
       window.location.reload();
     });
   };
@@ -127,38 +126,38 @@ const Dashboard = (props) => {
         toast.error(error);
       });
     } else {
-      axios({
-        url: url,
+      const urlSearchParams = new URLSearchParams({
+        currentEmail: props.email,
+        editField: editAccount.field,
+        email: editAccount.email,
+        username: editAccount.username,
+        bio: editAccount.bio,
+        password: editAccount.password,
+        passwordConfirm: editAccount.passwordConfirm,
+      });
+      fetch(`${url}?${urlSearchParams}`, {
         method: 'post',
-        params: {
-          currentEmail: props.email,
-          editField: editAccount.field,
-          email: editAccount.email,
-          username: editAccount.username,
-          bio: editAccount.bio,
-          password: editAccount.password,
-          passwordConfirm: editAccount.passwordConfirm,
-        },
       })
+        .then((res) => res.json())
         .then((res) => {
-          if (res.data.status === 'success') {
-            props.dispatch(setUser('email', res.data.email));
-            props.dispatch(setUser('username', res.data.username));
-            props.dispatch(setUser('bio', res.data.bio));
+          if (res.status === 'success') {
+            props.dispatch(setUser('email', res.email));
+            props.dispatch(setUser('username', res.username));
+            props.dispatch(setUser('bio', res.bio));
 
             setEditAccount({
               show: false,
               field: '',
               email: '',
               username: '',
-              bio: res.data.bio,
+              bio: res.bio,
               password: '',
               passwordConfirm: '',
             });
           }
         })
         .catch((error) => {
-          toast.error(error.response.data);
+          toast.error(error);
         });
     }
   };
@@ -168,10 +167,8 @@ const Dashboard = (props) => {
 
     const url = '/api/post/create';
     let formData = new FormData();
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
+    const headers = {
+      'content-type': 'multipart/form-data',
     };
     let newErrorMessage = [];
 
@@ -188,21 +185,25 @@ const Dashboard = (props) => {
         toast.error(error);
       });
     } else {
-      config.params = {
+      const urlSearchParams = new URLSearchParams({
         source: createPost.source,
         tags: createPost.tags,
-      };
+      });
       formData.append('image', createPost.file.value);
-      axios
-        .post(url, formData, config)
+      fetch(`${url}?${urlSearchParams}`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      })
+        .then((res) => res.json())
         .then((res) => {
-          if (res.data.status === 'success') {
+          if (res.status === 'success') {
             clearValues();
             props.dispatch(setPosts({ list: [], page: 1, totalCount: 0 }));
           }
         })
         .catch((error) => {
-          toast.error(error.response.data);
+          toast.error(error);
         });
     }
   };

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import { setFlags, setPosts, setTags } from '../actions';
 import PropTypes from 'prop-types';
@@ -227,7 +226,7 @@ const FlagList = (props) => {
   }, []);
 
   const retrieveFlags = () => {
-    axios.get('/api/post/flag/list').then((res) => {
+    fetch('/api/post/flag/list', { method: 'GET' }).then((res) => {
       if (res.data.length) {
         props.dispatch(
           setFlags(
@@ -249,9 +248,8 @@ const FlagList = (props) => {
     e.preventDefault();
     const selectedFlag = props.flags[selected];
 
-    axios({
-      url: `/api/post/delete/${selectedFlag.postId}`,
-      method: 'post',
+    fetch(`/api/post/delete/${selectedFlag.postId}`, {
+      method: 'POST',
     })
       .then(() => {
         toast.success('Post deleted.');
@@ -261,7 +259,7 @@ const FlagList = (props) => {
         retrieveFlags();
       })
       .catch((error) => {
-        toast.error(error.response.data);
+        toast.error(error);
       });
   };
 

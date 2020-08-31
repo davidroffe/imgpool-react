@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { setUser } from '../actions';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 
 const PasswordReset = (props) => {
@@ -25,22 +24,22 @@ const PasswordReset = (props) => {
         toast.error(error);
       });
     } else {
-      axios({
-        url: url,
-        method: 'post',
-        params: {
-          passwordResetToken: props.match.params.passwordResetToken,
-          password: password,
-        },
+      const urlSearchParams = new URLSearchParams({
+        passwordResetToken: props.match.params.passwordResetToken,
+        password: password,
+      });
+      fetch(`${url}?${urlSearchParams}`, {
+        method: 'POST',
       })
+        .then((res) => res.json())
         .then((res) => {
-          props.dispatch(setUser('email', res.data.email));
-          props.dispatch(setUser('username', res.data.username));
+          props.dispatch(setUser('email', res.email));
+          props.dispatch(setUser('username', res.username));
           props.dispatch(setUser('loggedIn', true));
           props.history.push('/account');
         })
         .catch((error) => {
-          toast.error(error.response.data);
+          toast.error(error);
         });
     }
   };
