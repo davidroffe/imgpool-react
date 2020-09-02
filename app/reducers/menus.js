@@ -5,9 +5,11 @@ const initialState = {
 const menus = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_TAGS_MENU':
-      return { ...state, tags: action.state };
+      return { ...initialState, tags: action.state };
     case 'SET_POST_OPTIONS_MENU':
-      return { ...state, postOptions: action.state };
+      return { ...initialState, postOptions: action.state };
+    case 'CLOSE_ALL_MENUS':
+      return initialState;
     default:
       return state;
   }

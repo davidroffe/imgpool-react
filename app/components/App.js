@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setMenu } from '../actions';
+import { closeAllMenus } from '../actions';
 import Header from './Header';
 import AdminDashboard from './AdminDashboard';
 import AccountDashboard from './AccountDashboard';
@@ -31,19 +31,7 @@ const mapStateToProps = (state) => {
 
 const App = (props) => {
   const handleClick = () => {
-    for (const menu in props.menus) {
-      if (props.menus.hasOwnProperty(menu) && props.menus[menu]) {
-        props.dispatch(
-          setMenu(
-            `${menu.replace(
-              /[A-Z]/g,
-              (letter) => `_${letter.toLowerCase()}`
-            )}_MENU`,
-            false
-          )
-        );
-      }
-    }
+    props.dispatch(closeAllMenus());
   };
   return (
     <div onClick={handleClick}>

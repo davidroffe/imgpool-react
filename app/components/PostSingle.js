@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { setUser, setPosts, setMenu, setTags } from '../actions';
+import {
+  setUser,
+  setPosts,
+  setMenu,
+  setTags,
+  closeAllMenusExcept,
+} from '../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import TagMenu from './TagMenu';
@@ -68,7 +74,14 @@ const Single = (props) => {
       });
   };
 
-  const toggleOptionsMenu = () => {
+  const handleMenuClick = (e) => {
+    e.stopPropagation();
+
+    props.dispatch(closeAllMenusExcept('POST_OPTIONS_MENU'));
+  };
+
+  const toggleOptionsMenu = (e) => {
+    e.stopPropagation();
     props.dispatch(setMenu('POST_OPTIONS_MENU', !props.optionsMenu));
   };
 
@@ -158,7 +171,10 @@ const Single = (props) => {
                 <button className="toggle-options" onClick={toggleOptionsMenu}>
                   options <span>+</span>
                 </button>
-                <ul className={`options${props.optionsMenu ? ' active' : ''}`}>
+                <ul
+                  className={`options${props.optionsMenu ? ' active' : ''}`}
+                  onClick={handleMenuClick}
+                >
                   <li>
                     <button
                       className={`toggle-fav${

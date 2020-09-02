@@ -28,6 +28,12 @@ export const setSearch = (text) => ({
   text,
 });
 
+export const closeAllMenus = () => ({
+  type: 'CLOSE_ALL_MENUS',
+});
+
+export const closeAllMenusExcept = (menu) => setMenu(menu, true);
+
 export const setMenu = (menu, state) => ({
   type: `SET_${menu.toUpperCase()}`,
   state,

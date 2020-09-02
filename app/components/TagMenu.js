@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setSearch, setMenu, setTags } from '../actions';
+import { setSearch, setMenu, setTags, closeAllMenusExcept } from '../actions';
 import tagUtil from '../utils/tags';
 
 const mapStateToProps = (state) => {
@@ -22,10 +22,15 @@ export const TagMenu = (props) => {
   }, [props.posts]);
   const toggleMenu = (e) => {
     e.preventDefault();
+    e.stopPropagation();
 
     props.dispatch(setMenu('TAGS_MENU', !props.showMenu));
   };
-  const handleClick = (tag, e) => {
+  const handleMenuClick = (e) => {
+    e.stopPropagation();
+    props.dispatch(closeAllMenusExcept('TAGS_MENU'));
+  };
+  const handleTagClick = (tag, e) => {
     e.preventDefault();
 
     const tagName = e.target.innerText.toLowerCase();
@@ -51,7 +56,7 @@ export const TagMenu = (props) => {
 
   return (
     <aside id="tag-menu" className={props.showMenu ? 'active' : ''}>
-      <div className="body">
+      <div className="body" onClick={handleMenuClick}>
         <nav>
           {props.tags.map((tag, index) => {
             return (
@@ -59,7 +64,7 @@ export const TagMenu = (props) => {
                 key={index}
                 to={'post?tag=' + tag.id}
                 className={'tag ' + tag.active}
-                onClick={handleClick.bind(this, tag)}
+                onClick={handleTagClick.bind(this, tag)}
                 active={tag.active ? '' : null}
               >
                 {tag.name}
