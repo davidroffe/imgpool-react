@@ -39,22 +39,15 @@ const Single = (props) => {
   useEffect(() => {
     const url = '/api/post/single';
     const urlSearchParams = new URLSearchParams({ id: post.id });
-    let isMounted = true;
     fetch(`${url}?${urlSearchParams}`, {
       method: 'GET',
     })
       .then((res) => res.json())
       .then((res) => {
-        if (isMounted) {
-          setPost(res);
-          props.dispatch(setTags(tagUtil.getTagsFromPosts([res])));
-        }
+        setPost(res);
+        props.dispatch(setTags(tagUtil.getTagsFromPosts([res])));
       })
       .catch(() => props.history.push('/404'));
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   const toggleFavorite = (e) => {
