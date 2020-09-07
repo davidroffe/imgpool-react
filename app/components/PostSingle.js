@@ -23,7 +23,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const Single = (props) => {
+export const PostSingle = (props) => {
   const [post, setPost] = useState({
     id: props.match.params.id || '',
     tag: [],
@@ -37,6 +37,7 @@ const Single = (props) => {
     reason: '',
   });
   useEffect(() => {
+    console.log('test');
     const url = '/api/post/single';
     const urlSearchParams = new URLSearchParams({ id: post.id });
     fetch(`${url}?${urlSearchParams}`, {
@@ -222,7 +223,7 @@ const Single = (props) => {
   );
 };
 
-Single.propTypes = {
+PostSingle.propTypes = {
   dispatch: PropTypes.func.isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
@@ -232,4 +233,4 @@ Single.propTypes = {
   optionsMenu: PropTypes.bool.isRequired,
 };
 
-export default connect(mapStateToProps)(Single);
+export default connect(mapStateToProps)(PostSingle);
