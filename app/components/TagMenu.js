@@ -2,8 +2,7 @@ import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setSearch, setMenu, setTags } from '../actions';
-import axios from 'axios';
+import { setSearch, setMenu, setTags, closeAllMenusExcept } from '../actions';
 import tagUtil from '../utils/tags';
 
 const mapStateToProps = (state) => {
@@ -23,14 +22,18 @@ export const TagMenu = (props) => {
   }, [props.posts]);
   const toggleMenu = (e) => {
     e.preventDefault();
+    e.stopPropagation();
 
     props.dispatch(setMenu('TAGS_MENU', !props.showMenu));
   };
-  const handleClick = (tag, e) => {
+  const handleMenuClick = (e) => {
+    e.stopPropagation();
+    props.dispatch(closeAllMenusExcept('TAGS_MENU'));
+  };
+  const handleTagClick = (tag, e) => {
     e.preventDefault();
 
     const tagName = e.target.innerText.toLowerCase();
-    const url = '/api/post/search';
     const tagIndex = props.searchQuery.indexOf(tagName);
     let newSearchQuery =
       props.searchQuery.length === 1 && props.searchQuery[0] === ''
@@ -49,15 +52,11 @@ export const TagMenu = (props) => {
       newSearchQuery.length > 1 ? newSearchQuery.join(' ') : newSearchQuery[0];
 
     props.dispatch(setSearch(newSearchQuery));
-    axios.get(url, { params: { searchQuery: newSearchQuery } }).then(() => {
-      props.dispatch(setMenu('TAGS_MENU', !props.showMenu));
-      props.history.push('/posts');
-    });
   };
 
   return (
     <aside id="tag-menu" className={props.showMenu ? 'active' : ''}>
-      <div className="body">
+      <div className="body" onClick={handleMenuClick}>
         <nav>
           {props.tags.map((tag, index) => {
             return (
@@ -65,7 +64,7 @@ export const TagMenu = (props) => {
                 key={index}
                 to={'post?tag=' + tag.id}
                 className={'tag ' + tag.active}
-                onClick={handleClick.bind(this, tag)}
+                onClick={handleTagClick.bind(this, tag)}
                 active={tag.active ? '' : null}
               >
                 {tag.name}

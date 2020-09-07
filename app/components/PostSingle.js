@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { setUser, setPosts, setMenu, setTags } from '../actions';
+import {
+  setUser,
+  setPosts,
+  setMenu,
+  setTags,
+  closeAllMenusExcept,
+} from '../actions';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import TagMenu from './TagMenu';
 import FlagPost from './FlagPost';
@@ -18,7 +23,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const Single = (props) => {
+export const PostSingle = (props) => {
   const [post, setPost] = useState({
     id: props.match.params.id || '',
     tag: [],
@@ -32,42 +37,45 @@ const Single = (props) => {
     reason: '',
   });
   useEffect(() => {
-    let isMounted = true;
-    axios
-      .get('/api/post/single', {
-        params: { id: post.id },
-      })
+    console.log('test');
+    const url = '/api/post/single';
+    const urlSearchParams = new URLSearchParams({ id: post.id });
+    fetch(`${url}?${urlSearchParams}`, {
+      method: 'GET',
+    })
+      .then((res) => res.json())
       .then((res) => {
-        if (isMounted) {
-          setPost(res.data);
-          props.dispatch(setTags(tagUtil.getTagsFromPosts([res.data])));
-        }
+        setPost(res);
+        props.dispatch(setTags(tagUtil.getTagsFromPosts([res])));
       })
       .catch(() => props.history.push('/404'));
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   const toggleFavorite = (e) => {
     e.preventDefault();
+    const url = '/api/post/favorite';
+    const urlSearchParams = new URLSearchParams({ postId: post.id });
 
-    axios({
-      url: '/api/post/favorite',
-      method: 'post',
-      params: {
-        postId: post.id,
-      },
-    }).then((res) => {
-      toast.success(
-        `Post ${isFavorited() ? 'removed from' : 'added to'} favorites.`
-      );
-      props.dispatch(setUser('favorites', res.data.favorites));
-    });
+    fetch(`${url}?${urlSearchParams}`, {
+      method: 'POST',
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        toast.success(
+          `Post ${isFavorited() ? 'removed from' : 'added to'} favorites.`
+        );
+        props.dispatch(setUser('favorites', res.favorites));
+      });
   };
 
-  const toggleOptionsMenu = () => {
+  const handleMenuClick = (e) => {
+    e.stopPropagation();
+
+    props.dispatch(closeAllMenusExcept('POST_OPTIONS_MENU'));
+  };
+
+  const toggleOptionsMenu = (e) => {
+    e.stopPropagation();
     props.dispatch(setMenu('POST_OPTIONS_MENU', !props.optionsMenu));
   };
 
@@ -80,10 +88,10 @@ const Single = (props) => {
 
   const deletePost = (e) => {
     e.preventDefault();
+    const url = `/api/post/delete/${post.id}`;
 
-    axios({
-      url: `/api/post/delete/${post.id}`,
-      method: 'post',
+    fetch(url, {
+      method: 'POST',
     })
       .then(() => {
         toast.success('Post deleted.');
@@ -92,7 +100,7 @@ const Single = (props) => {
         props.history.push('/posts');
       })
       .catch((error) => {
-        toast.error(error.response.data);
+        toast.error(error);
       });
   };
 
@@ -116,16 +124,18 @@ const Single = (props) => {
         toast.error(error);
       });
     } else {
-      axios({
-        url: '/api/post/flag/create',
-        method: 'post',
-        params: {
-          postId: post.id,
-          reason: flagPost.reason,
-        },
+      const url = '/api/post/flag/create';
+      const urlSearchParams = new URLSearchParams({
+        postId: post.id,
+        reason: flagPost.reason,
+      });
+
+      fetch(`${url}?${urlSearchParams}`, {
+        method: 'POST',
       })
+        .then((res) => res.json())
         .then((res) => {
-          if (res.data.status === 'success') {
+          if (res.status === 'success') {
             setFlagPost({
               show: false,
               reason: '',
@@ -134,7 +144,7 @@ const Single = (props) => {
           }
         })
         .catch((error) => {
-          toast.error(error.response.data);
+          toast.error(error);
         });
     }
   };
@@ -155,7 +165,10 @@ const Single = (props) => {
                 <button className="toggle-options" onClick={toggleOptionsMenu}>
                   options <span>+</span>
                 </button>
-                <ul className={`options${props.optionsMenu ? ' active' : ''}`}>
+                <ul
+                  className={`options${props.optionsMenu ? ' active' : ''}`}
+                  onClick={handleMenuClick}
+                >
                   <li>
                     <button
                       className={`toggle-fav${
@@ -210,7 +223,7 @@ const Single = (props) => {
   );
 };
 
-Single.propTypes = {
+PostSingle.propTypes = {
   dispatch: PropTypes.func.isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
@@ -220,4 +233,4 @@ Single.propTypes = {
   optionsMenu: PropTypes.bool.isRequired,
 };
 
-export default connect(mapStateToProps)(Single);
+export default connect(mapStateToProps)(PostSingle);

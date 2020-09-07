@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { setPosts, setSearch } from '../../actions';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
@@ -33,14 +32,14 @@ const Dashboard = (props) => {
     bio: '',
   });
   useEffect(() => {
-    axios
-      .get(`/api/user/get/${props.match.params.id}`)
+    const url = `/api/user/get/${props.match.params.id}`;
+    fetch(url, { method: 'GET' })
       .then((res) => {
-        if (res.data.valid) {
+        if (res.valid) {
           setUser({
-            ...res.data,
-            favorites: res.data.favoritedPosts,
-            joinDate: new Date(res.data.joinDate).toLocaleDateString('en-US', {
+            ...res,
+            favorites: res.favoritedPosts,
+            joinDate: new Date(res.joinDate).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
@@ -102,24 +101,25 @@ const Dashboard = (props) => {
         toast.error(error);
       });
     } else {
-      axios({
-        url: url,
-        method: 'post',
-        params: {
-          currentEmail: user.email,
-          editField: editAccount.field,
-          email: editAccount.email,
-          username: editAccount.username,
-          bio: editAccount.bio,
-        },
+      const urlSearchParams = new URLSearchParams({
+        currentEmail: user.email,
+        editField: editAccount.field,
+        email: editAccount.email,
+        username: editAccount.username,
+        bio: editAccount.bio,
+      });
+
+      fetch(`${url}?${urlSearchParams}`, {
+        method: 'POST',
       })
+        .then((res) => res.json())
         .then((res) => {
-          if (res.data.status === 'success') {
+          if (res.status === 'success') {
             setUser({
               ...user,
-              email: res.data.email,
-              username: res.data.username,
-              bio: res.data.bio,
+              email: res.email,
+              username: res.username,
+              bio: res.bio,
             });
 
             setEditAccount({
@@ -141,9 +141,9 @@ const Dashboard = (props) => {
 
   const resetPassword = () => {
     const url = `/api/user/password-reset/${user.id}`;
-    axios({
-      url: url,
-      method: 'post',
+
+    fetch(url, {
+      method: 'POST',
     }).then(() => {});
   };
 
@@ -152,14 +152,14 @@ const Dashboard = (props) => {
 
     const url = `/api/user/${user.active ? 'disable' : 'enable'}/${user.id}`;
 
-    axios({
-      url: url,
-      method: 'post',
+    fetch(url, {
+      method: 'POST',
     })
+      .then((res) => res.json())
       .then((res) => {
         setUser({
           ...user,
-          active: res.data.active,
+          active: res.active,
         });
       })
       .catch((error) => {
@@ -175,7 +175,7 @@ const Dashboard = (props) => {
 
     apiUtil.search(searchQuery).then((res) => {
       props.dispatch(
-        setPosts({ list: res.data, page: 1, totalCount: res.data.totalCount })
+        setPosts({ list: res, page: 1, totalCount: res.totalCount })
       );
       props.history.push('/posts');
     });
@@ -189,7 +189,7 @@ const Dashboard = (props) => {
 
     apiUtil.search(searchQuery).then((res) => {
       props.dispatch(
-        setPosts({ list: res.data, page: 1, totalCount: res.data.totalCount })
+        setPosts({ list: res, page: 1, totalCount: res.totalCount })
       );
       props.history.push('/posts');
     });

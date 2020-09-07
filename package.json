@@ -11,6 +11,8 @@
   },
   "scripts": {
     "init": "node init.js",
+    "dev:server": "NODE_ENV=development node server.js",
+    "prod:server": "NODE_ENV=production node server.js",
     "build": "webpack --env.environment=production && ln -s ../uploads ./public/uploads",
     "dev": "webpack --env.environment=development && ln -s ../uploads ./public/uploads",
     "test": "jest"
@@ -20,15 +22,18 @@
   "dependencies": {
     "@material-ui/core": "^4.5.1",
     "@material-ui/icons": "^4.5.1",
-    "axios": "^0.19.0",
     "eslint": "5.16.0",
+    "koa": "^2.13.0",
+    "koa-logger": "^3.2.1",
+    "koa-send": "^5.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.1",
     "react-router-dom": "^5.0.1",
     "react-select": "^3.0.5",
     "react-toastify": "^5.4.0",
-    "redux": "^4.0.4"
+    "redux": "^4.0.4",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",

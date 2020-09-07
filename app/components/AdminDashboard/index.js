@@ -2,25 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { setTags, setUsers, setFlags } from '../../actions';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import TagForm from './TagForm';
 import UserSelectForm from './UserSelectForm';
 import Loader from '../Utility/Loader';
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     loggedIn: state.user.loggedIn,
     admin: state.user.admin,
     tags: state.tags,
     users: state.users,
     flags: state.flags,
-    userInit: state.user.init
+    userInit: state.user.init,
   };
 };
 
-const Dashboard = props => {
+const Dashboard = (props) => {
   const [showUserForm, setShowUserForm] = useState(false);
   const [showTagForm, setShowTagForm] = useState(false);
   const [canSignUp, setCanSignUp] = useState(true);
@@ -48,62 +47,68 @@ const Dashboard = props => {
   });
 
   const retrieveTags = () => {
-    axios.get('/api/tag/get').then(res => {
-      props.dispatch(setTags(res.data.length ? res.data : [false]));
-    });
+    fetch('/api/tag/get', { method: 'GET' })
+      .then((res) => res.json())
+      .then((res) => {
+        props.dispatch(setTags(res.length ? res : [false]));
+      });
   };
 
   const retrieveUsers = () => {
-    axios.get('/api/user/get').then(res => {
-      props.dispatch(setUsers(res.data.length ? res.data : [false]));
-    });
+    fetch('/api/user/get', { method: 'GET' })
+      .then((res) => res.json())
+      .then((res) => {
+        props.dispatch(setUsers(res.length ? res : [false]));
+      });
   };
 
   const retrieveflags = () => {
-    axios.get('/api/post/flag/get/').then(res => {
-      props.dispatch(setFlags(res.data.length ? res.data : [false]));
-    });
+    fetch('/api/post/flag/get/', { method: 'GET' })
+      .then((res) => res.json())
+      .then((res) => {
+        props.dispatch(setFlags(res.length ? res : [false]));
+      });
   };
 
   const retrieveSignUpStatus = () => {
-    axios.get('/api/setting/signup/').then(res => {
-      setCanSignUp(res.data.signUp);
-    });
+    fetch('/api/setting/signup/', { method: 'GET' })
+      .then((res) => res.json())
+      .then((res) => {
+        setCanSignUp(res.signUp);
+      });
   };
 
-  const toggleSignup = e => {
+  const toggleSignup = (e) => {
     e.preventDefault();
 
     const url = '/api/setting/signup/toggle';
 
-    axios({
-      url: url,
-      method: 'post'
+    fetch(url, {
+      method: 'post',
     })
-      .then(res => {
+      .then((res) => res.json())
+      .then((res) => {
         retrieveTags();
-        setCanSignUp(res.data.signUp);
+        setCanSignUp(res.signUp);
       })
-      .catch(error => {
-        toast.error(error.response.data);
+      .catch((error) => {
+        toast.error(error);
       });
   };
 
   const handleTagSubmit = (url, tagIds) => {
     if (tagIds.length) {
-      axios({
-        url: url,
+      const urlSearchParams = new URLSearchParams({ tagIds });
+
+      fetch(`${url}?${urlSearchParams}`, {
         method: 'post',
-        params: {
-          tagIds: tagIds
-        }
       })
         .then(() => {
           retrieveTags();
           setShowTagForm(!showTagForm);
         })
-        .catch(error => {
-          toast.error(error.response.data);
+        .catch((error) => {
+          toast.error(error);
         });
     } else {
       toast.error('Please select one or more tags.');
@@ -193,7 +198,7 @@ Dashboard.propTypes = {
   history: PropTypes.object.isRequired,
   tags: PropTypes.array.isRequired,
   users: PropTypes.array.isRequired,
-  flags: PropTypes.array.isRequired
+  flags: PropTypes.array.isRequired,
 };
 
 export default connect(mapStateToProps)(Dashboard);

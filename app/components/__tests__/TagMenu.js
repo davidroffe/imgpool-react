@@ -18,6 +18,7 @@ describe('TagMenu', () => {
     const menuToggle = wrapper.find('.tab').at(0);
     menuToggle.simulate('click', {
       preventDefault: () => {},
+      stopPropagation: () => {},
     });
     expect(mockDispatch).toHaveBeenLastCalledWith({
       type: 'SET_TAGS_MENU',

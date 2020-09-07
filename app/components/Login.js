@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { setUser } from '../actions';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 
 const mapStateToProps = (state) => {
@@ -21,11 +20,13 @@ export const Login = (props) => {
   const [canSignUp, setCanSignUp] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/setting/signup').then((res) => {
-      if (res.data) {
-        setCanSignUp(res.data.signUp);
-      }
-    });
+    fetch('/api/setting/signup', { method: 'GET' })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res) {
+          setCanSignUp(res.signUp);
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -86,30 +87,30 @@ export const Login = (props) => {
         toast.error(error);
       });
     } else {
-      axios({
-        url: url,
-        method: 'post',
-        params: {
-          email: email,
-          username: username,
-          password: password,
-          passwordConfirm: passwordConfirm,
-          recaptchaResponse,
-        },
+      const urlSeachParams = new URLSearchParams({
+        email: email,
+        username: username,
+        password: password,
+        passwordConfirm: passwordConfirm,
+        recaptchaResponse,
+      });
+      fetch(`${url}?${urlSeachParams}`, {
+        method: 'POST',
       })
+        .then((res) => res.json())
         .then((res) => {
           if (form === 'forgotPassword') {
             toast.success('An email has been sent.');
           } else {
-            props.dispatch(setUser('email', res.data.email));
-            props.dispatch(setUser('username', res.data.username));
+            props.dispatch(setUser('email', res.email));
+            props.dispatch(setUser('username', res.username));
             props.dispatch(setUser('loggedIn', true));
-            props.dispatch(setUser('admin', res.data.admin));
+            props.dispatch(setUser('admin', res.admin));
             props.history.push('/account');
           }
         })
         .catch((error) => {
-          toast.error(error.response.data);
+          toast.error(error);
         });
     }
   };
