@@ -4,19 +4,19 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Logo from '../assets/images/logo.svg';
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     loggedIn: state.user.loggedIn,
-    admin: state.user.admin
+    admin: state.user.admin,
   };
 };
 
-const Header = props => {
+const Header = (props) => {
   return (
     <header id="main-header">
       <div className="left">
         <Link className="logo" to="/">
-          <img src={Logo} alt="Classic Team Championship Logo" />
+          <img src={Logo} alt="Imgpool Logo" />
         </Link>
         <nav id="main-nav">
           <Link to="/posts">Posts</Link>
@@ -35,7 +35,7 @@ const Header = props => {
 Header.propTypes = {
   children: PropTypes.element.isRequired,
   loggedIn: PropTypes.bool.isRequired,
-  admin: PropTypes.bool.isRequired
+  admin: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps)(Header);
