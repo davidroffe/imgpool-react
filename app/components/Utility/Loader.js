@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Modal = props => {
+const Loader = (props) => {
   return props.show ? (
     <div className="loader-container">
       <div className="preloader2">
@@ -15,8 +15,8 @@ const Modal = props => {
   ) : null;
 };
 
-Modal.propTypes = {
-  show: PropTypes.bool.isRequired
+Loader.propTypes = {
+  show: PropTypes.bool.isRequired,
 };
 
-export default Modal;
+export default Loader;

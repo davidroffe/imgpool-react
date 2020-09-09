@@ -5,18 +5,24 @@ import { setPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
 import apiUtil from '../utils/api';
+import Loader from './Utility/Loader';
 
 const mapStateToProps = (state) => {
   return {
     posts: state.posts,
     searchQuery: state.search,
+    loading: state.loading,
   };
 };
 
-const List = (props) => {
+const PostList = (props) => {
   const [lastPage, setLastPage] = useState(
     Math.ceil(props.posts.totalCount / 18)
   );
+  const [isLoading, setIsLoading] = useState(false);
+  let imagesLoading = 0;
+  let imagesLoaded = 0;
+
   useEffect(() => {
     if (!props.posts.list.length) {
       retrievePosts(props.posts.page);
@@ -25,6 +31,9 @@ const List = (props) => {
   }, [props.posts]);
 
   const retrievePosts = (nextPage) => {
+    setIsLoading(true);
+    imagesLoading = 0;
+    imagesLoaded = 0;
     apiUtil.search(props.searchQuery, nextPage).then((res) => {
       props.dispatch(
         setPosts(
@@ -52,7 +61,7 @@ const List = (props) => {
     retrievePosts(page);
   };
 
-  if (!props.posts.list[0]) {
+  if (!props.posts.list[0] && props.posts.init) {
     return (
       <section id="splash">
         <div id="splash-center">
@@ -62,20 +71,28 @@ const List = (props) => {
     );
   } else {
     return (
-      <section id="post-list">
+      <div>
         <TagMenu />
-        {props.posts.list.map((post, index) => {
-          return (
-            <Link key={index} to={'/post/' + post.id} className="post-item">
-              <img
-                src={post.thumbUrl}
-                alt={post.tag.map((tag) => {
-                  return tag.name;
-                })}
-              />
-            </Link>
-          );
-        })}
+        <section id="post-list">
+          <Loader show={isLoading} />
+          {props.posts.list.map((post, index) => {
+            imagesLoading++;
+            return (
+              <Link key={index} to={'/post/' + post.id} className="post-item">
+                <img
+                  onLoad={() => {
+                    if (imagesLoaded + 1 === imagesLoading) setIsLoading(false);
+                    imagesLoaded++;
+                  }}
+                  src={post.thumbUrl}
+                  alt={post.tag.map((tag) => {
+                    return tag.name;
+                  })}
+                />
+              </Link>
+            );
+          })}
+        </section>
         <aside className="paginator">
           <button
             className="previous"
@@ -142,14 +159,14 @@ const List = (props) => {
             →
           </button>
         </aside>
-      </section>
+      </div>
     );
   }
 };
 
-List.propTypes = {
+PostList.propTypes = {
   dispatch: PropTypes.func.isRequired,
   posts: PropTypes.object.isRequired,
 };
 
-export default connect(mapStateToProps)(List);
+export default connect(mapStateToProps)(PostList);

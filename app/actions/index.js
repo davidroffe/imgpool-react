@@ -1,6 +1,6 @@
 export const setPosts = (posts) => ({
   type: 'SET_POSTS',
-  posts,
+  posts: { ...posts, init: true },
 });
 
 export const setTags = (tags) => ({
