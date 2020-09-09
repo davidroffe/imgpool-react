@@ -96,13 +96,17 @@ const PostList = (props) => {
         <aside className="paginator">
           <button
             className="previous"
-            disabled={props.posts.page < 2}
+            disabled={props.posts.page < 2 || isLoading}
             onClick={changePage.bind(null, 'prev')}
           >
             ←
           </button>
           {props.posts.page >= 6 ? (
-            <button className="number" onClick={changePage.bind(null, 1)}>
+            <button
+              disabled={isLoading}
+              className="number"
+              onClick={changePage.bind(null, 1)}
+            >
               1
             </button>
           ) : null}
@@ -123,6 +127,7 @@ const PostList = (props) => {
             }
           })}
           <button
+            disabled={isLoading}
             className="number active"
             onClick={changePage.bind(null, props.posts.page)}
           >
@@ -134,6 +139,7 @@ const PostList = (props) => {
             if (pageLink <= lastPage) {
               return (
                 <button
+                  disabled={isLoading}
                   key={i}
                   className="number"
                   onClick={changePage.bind(null, pageLink)}
@@ -145,6 +151,7 @@ const PostList = (props) => {
           })}
           {props.posts.page <= lastPage - 6 ? (
             <button
+              disabled={isLoading}
               className="number"
               onClick={changePage.bind(null, lastPage)}
             >
@@ -153,7 +160,7 @@ const PostList = (props) => {
           ) : null}
           <button
             className="next"
-            disabled={lastPage === props.posts.page}
+            disabled={lastPage === props.posts.page || isLoading}
             onClick={changePage.bind(null, 'next')}
           >
             →
