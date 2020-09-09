@@ -13,6 +13,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import TagMenu from './TagMenu';
 import FlagPost from './FlagPost';
 import tagUtil from '../utils/tags';
+import Loader from './Utility/Loader';
 
 const mapStateToProps = (state) => {
   return {
@@ -24,6 +25,7 @@ const mapStateToProps = (state) => {
 };
 
 export const PostSingle = (props) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [post, setPost] = useState({
     id: props.match.params.id || '',
     tag: [],
@@ -37,9 +39,11 @@ export const PostSingle = (props) => {
     reason: '',
   });
   useEffect(() => {
-    console.log('test');
     const url = '/api/post/single';
     const urlSearchParams = new URLSearchParams({ id: post.id });
+
+    setIsLoading(true);
+
     fetch(`${url}?${urlSearchParams}`, {
       method: 'GET',
     })
@@ -155,62 +159,70 @@ export const PostSingle = (props) => {
 
   return (
     <section className="container" id="post-single">
+      <Loader show={isLoading} />
       <ToastContainer />
       <TagMenu />
       <div className="image-container">
         <div className="inner">
-          <div className="post-info">
-            {props.userId ? (
-              <div>
-                <button className="toggle-options" onClick={toggleOptionsMenu}>
-                  options <span>+</span>
-                </button>
-                <ul
-                  className={`options${props.optionsMenu ? ' active' : ''}`}
-                  onClick={handleMenuClick}
-                >
-                  <li>
-                    <button
-                      className={`toggle-fav${
-                        isFavorited() ? ' favorited' : ''
-                      }`}
-                      onClick={toggleFavorite}
-                    >
-                      <span className="icon">&hearts;</span>
-                      <span className="text add">add to favorites</span>
-                      <span className="text remove">remove from favorites</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      className="flag-post"
-                      onClick={() => {
-                        setFlagPost({ ...flagPost, show: true });
-                      }}
-                    >
-                      <span className="icon flag">&#9873;</span>
-                      <span className="text">flag post</span>
-                    </button>
-                  </li>
-                  {post.userId === props.userId || props.isAdmin ? (
+          {!isLoading ? (
+            <div className="post-info">
+              {props.userId ? (
+                <div>
+                  <button
+                    className="toggle-options"
+                    onClick={toggleOptionsMenu}
+                  >
+                    options <span>+</span>
+                  </button>
+                  <ul
+                    className={`options${props.optionsMenu ? ' active' : ''}`}
+                    onClick={handleMenuClick}
+                  >
                     <li>
-                      <button className="delete-post" onClick={deletePost}>
-                        <span className="icon x">×</span>
-                        <span className="text">delete post</span>
+                      <button
+                        className={`toggle-fav${
+                          isFavorited() ? ' favorited' : ''
+                        }`}
+                        onClick={toggleFavorite}
+                      >
+                        <span className="icon">&hearts;</span>
+                        <span className="text add">add to favorites</span>
+                        <span className="text remove">
+                          remove from favorites
+                        </span>
                       </button>
                     </li>
-                  ) : null}
-                </ul>
-              </div>
-            ) : (
-              <div></div>
-            )}
-            <p className="poster">
-              posted by:{' '}
-              <Link to={`/user/${post.user.id}`}>{post.user.username}</Link>
-            </p>
-          </div>
-          <img src={post.url} />
+                    <li>
+                      <button
+                        className="flag-post"
+                        onClick={() => {
+                          setFlagPost({ ...flagPost, show: true });
+                        }}
+                      >
+                        <span className="icon flag">&#9873;</span>
+                        <span className="text">flag post</span>
+                      </button>
+                    </li>
+                    {post.userId === props.userId || props.isAdmin ? (
+                      <li>
+                        <button className="delete-post" onClick={deletePost}>
+                          <span className="icon x">×</span>
+                          <span className="text">delete post</span>
+                        </button>
+                      </li>
+                    ) : null}
+                  </ul>
+                </div>
+              ) : (
+                <div></div>
+              )}
+              <p className="poster">
+                posted by:{' '}
+                <Link to={`/user/${post.user.id}`}>{post.user.username}</Link>
+              </p>
+            </div>
+          ) : null}
+          <img onLoad={() => setIsLoading(false)} src={post.url} />
         </div>
       </div>
       <FlagPost
