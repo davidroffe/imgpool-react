@@ -21,6 +21,5 @@ app.use(async (ctx, next) => {
     await send(ctx, ctx.path, { root: publicPath });
   }
 });
-console.log('test');
 const server = app.listen(process.env.PORT || 8080);
 module.exports = server;
