@@ -7,14 +7,19 @@
     "presets": [
       "@babel/preset-env",
       "@babel/preset-react"
+    ],
+    "plugins": [
+      "@babel/plugin-transform-runtime"
     ]
   },
   "scripts": {
     "init": "node init.js",
-    "dev:server": "NODE_ENV=development node server.js",
-    "prod:server": "NODE_ENV=production node server.js",
-    "build": "webpack --env.environment=production && ln -s ../uploads ./public/uploads",
-    "dev": "webpack --env.environment=development && ln -s ../uploads ./public/uploads",
+    "run:server:dev": "NODE_ENV=development node server.js",
+    "run:server:prod": "NODE_ENV=production node server.js",
+    "build:client:dev": "webpack --env.environment=development && ln -s ../uploads ./public/uploads",
+    "build:client:prod": "webpack --env.environment=production && ln -s ../uploads ./public/uploads",
+    "build:server:dev": "webpack --env.environment=development --config webpack.server.js",
+    "build:server:prod": "webpack --env.environment=production --config webpack.server.js",
     "test": "jest"
   },
   "author": "David Roffe <davidroffe@gmail.com>",
@@ -22,6 +27,7 @@
   "dependencies": {
     "@material-ui/core": "^4.5.1",
     "@material-ui/icons": "^4.5.1",
+    "axios": "^0.20.0",
     "eslint": "5.16.0",
     "koa": "^2.13.0",
     "koa-logger": "^3.2.1",
@@ -37,6 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.11.5",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.2",
@@ -63,9 +70,11 @@
     "redux-mock-store": "^1.5.4",
     "sequelize-cli": "^5.5.0",
     "style-loader": "^0.23.1",
+    "svg-url-loader": "^6.0.0",
     "url-loader": "^2.1.0",
     "webpack": "^4.41.4",
-    "webpack-cli": "^3.3.6"
+    "webpack-cli": "^3.3.6",
+    "webpack-node-externals": "^1.7.2"
   },
   "resolutions": {
     "**/**/minimist": "^1.2.3",
