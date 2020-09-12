@@ -1,45 +1,43 @@
 import fs from 'fs';
 import path from 'path';
-import axios from 'axios';
 import Koa from 'koa';
 import send from 'koa-send';
 import logger from 'koa-logger';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { StaticRouter } from 'react-router-dom';
+import { StaticRouter, matchPath } from 'react-router-dom';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import imgpoolApp from '../app/reducers';
 import App from '../app/components/App';
+import routes from './routes';
 import { config } from 'dotenv';
 
 const app = new Koa();
 const publicPath = __dirname + '/../public';
 config();
 
-function getPosts() {
-  return axios.get(`${process.env.API_HOST}/api/post/list?searchQuery=&page=1`);
-}
+function getData(ctx) {
+  const promises = [];
+  routes.some((route) => {
+    const match = matchPath(ctx.url, route);
+    if (match) promises.push(route.loadData(match));
+    return match;
+  });
 
-function getData() {
-  return getPosts().then((res) => {
-    const preloadedState = { posts: { page: 1, init: true } };
+  return Promise.all(promises).then((data) => {
+    let preloadedState = {};
 
-    if (res.data.hasOwnProperty('list') && res.data.list.length > 0) {
-      preloadedState.posts = {
-        ...preloadedState.posts,
-        ...res.data,
-      };
-    } else {
-      return {};
-    }
+    data.forEach((state) => {
+      preloadedState = { ...preloadedState, ...state };
+    });
 
     return preloadedState;
   });
 }
 
 function handleRender(ctx) {
-  return getData().then((preloadedState) => {
+  return getData(ctx).then((preloadedState) => {
     const store = createStore(imgpoolApp, preloadedState);
     const html = ReactDOMServer.renderToString(
       <Provider store={store}>
