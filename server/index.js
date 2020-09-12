@@ -9,8 +9,8 @@ import ReactDOMServer from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import imgpoolApp from './app/reducers';
-import App from './app/components/App';
+import imgpoolApp from '../app/reducers';
+import App from '../app/components/App';
 import { config } from 'dotenv';
 
 const app = new Koa();
