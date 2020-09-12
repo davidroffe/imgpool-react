@@ -33,7 +33,7 @@ export const PostSingle = (props) => {
     reason: '',
   });
   useEffect(() => {
-    if (props.post.id === '') {
+    if (props.post.id === '' || props.post.id != props.match.params.id) {
       const url = '/api/post/single';
       const urlSearchParams = new URLSearchParams({
         id: props.match.params.id,
