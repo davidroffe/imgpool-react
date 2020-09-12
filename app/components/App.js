@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { closeAllMenus } from '../actions';
@@ -35,30 +30,28 @@ const App = (props) => {
   };
   return (
     <div onClick={handleClick}>
-      <Router>
-        <Auth>
-          <Header>
-            <PostSearch />
-          </Header>
-          <Switch>
-            <Route path="/posts" exact component={PostList} />
-            <Route path="/post/:id" component={PostSingle} />
-            <Route path="/account" exact component={AccountDashboard} />
-            <Route
-              path="/password-reset/:passwordResetToken"
-              exact
-              component={PasswordReset}
-            />
-            <Route path="/admin" exact component={AdminDashboard} />
-            <Route path="/user/:id" exact component={UserProfile} />
-            <Route path="/flags" exact component={FlagList} />
-            <Route path="/about" exact component={About} />
-            <Route path="/login" exact component={Login} />
-            <Redirect from="/" exact to="/posts" />
-            <Route component={NotFound} />
-          </Switch>
-        </Auth>
-      </Router>
+      <Auth>
+        <Header>
+          <PostSearch />
+        </Header>
+        <Switch>
+          <Route path="/posts" exact component={PostList} />
+          <Route path="/post/:id" component={PostSingle} />
+          <Route path="/account" exact component={AccountDashboard} />
+          <Route
+            path="/password-reset/:passwordResetToken"
+            exact
+            component={PasswordReset}
+          />
+          <Route path="/admin" exact component={AdminDashboard} />
+          <Route path="/user/:id" exact component={UserProfile} />
+          <Route path="/flags" exact component={FlagList} />
+          <Route path="/about" exact component={About} />
+          <Route path="/login" exact component={Login} />
+          <Redirect from="/" exact to="/posts" />
+          <Route component={NotFound} />
+        </Switch>
+      </Auth>
     </div>
   );
 };

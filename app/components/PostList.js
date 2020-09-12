@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { setPosts } from '../actions';
+import { setPosts, setTags } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
 import apiUtil from '../utils/api';
+import tagUtil from '../utils/tags';
 import Loader from './Utility/Loader';
 
 const mapStateToProps = (state) => {
@@ -35,16 +36,17 @@ const PostList = (props) => {
     imagesLoading = 0;
     imagesLoaded = 0;
     apiUtil.search(props.searchQuery, nextPage).then((res) => {
+      const newPosts = res.list.length
+        ? {
+            list: res.list,
+            page: nextPage,
+            totalCount: res.totalCount,
+          }
+        : { list: [false], page: 1, totalCount: 0 };
+
+      props.dispatch(setPosts(newPosts));
       props.dispatch(
-        setPosts(
-          res.list.length
-            ? {
-                list: res.list,
-                page: nextPage,
-                totalCount: res.totalCount,
-              }
-            : { list: [false], page: 1, totalCount: 0 }
-        )
+        setTags(tagUtil.getTagsFromPosts(newPosts.list, props.searchQuery))
       );
     });
   };
