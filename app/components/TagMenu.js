@@ -2,8 +2,7 @@ import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setSearch, setMenu, setTags, closeAllMenusExcept } from '../actions';
-import tagUtil from '../utils/tags';
+import { setSearch, setMenu, closeAllMenusExcept } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
@@ -15,11 +14,6 @@ const mapStateToProps = (state) => {
 };
 
 export const TagMenu = (props) => {
-  React.useEffect(() => {
-    props.dispatch(
-      setTags(tagUtil.getTagsFromPosts(props.posts, props.searchQuery))
-    );
-  }, [props.posts]);
   const toggleMenu = (e) => {
     e.preventDefault();
     e.stopPropagation();
