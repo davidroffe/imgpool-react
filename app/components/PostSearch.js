@@ -2,8 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { setSearch, setPosts } from '../actions';
+import { setSearch, setPosts, setTags } from '../actions';
 import apiUtil from '../utils/api';
+import tagUtil from '../utils/tags';
 
 const mapStateToProps = (state) => {
   return { searchQuery: state.search };
@@ -25,16 +26,17 @@ export const PostSearch = (props) => {
   };
   const handleSearch = () => {
     apiUtil.search(props.searchQuery, 1).then((res) => {
+      const newPosts = res.list.length
+        ? {
+            list: res.list,
+            page: 1,
+            totalCount: res.totalCount,
+          }
+        : { list: [false], page: 1, totalCount: 0 };
+
+      props.dispatch(setPosts(newPosts));
       props.dispatch(
-        setPosts(
-          res.list.length
-            ? {
-                list: res.list,
-                page: 1,
-                totalCount: res.totalCount,
-              }
-            : { list: [false], page: 1, totalCount: 0 }
-        )
+        setTags(tagUtil.getTagsFromPosts(newPosts.list, props.searchQuery))
       );
       props.history.push('/posts');
     });
