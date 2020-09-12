@@ -1,17 +1,23 @@
 import axios from 'axios';
+import tagUtil from '../app/utils/tags';
 
 export default (route) => {
-  switch (route.url) {
+  switch (route.path) {
     case '/posts':
       return axios
         .get(`${process.env.API_HOST}/api/post/list?searchQuery=&page=1`)
         .then((res) => {
-          return { posts: { ...res.data, page: 1, init: true } };
+          return {
+            posts: { ...res.data, page: 1, init: true },
+            tags: tagUtil.getTagsFromPosts(res.data.list),
+          };
         });
     case '/post/:id':
-      return axios.get(
-        `${process.env.API_HOST}/api/post/single?id=${route.params.id}`
-      );
+      return axios
+        .get(`${process.env.API_HOST}/api/post/single?id=${route.params.id}`)
+        .then((res) => {
+          return { post: res.data, tags: tagUtil.getTagsFromPosts([res.data]) };
+        });
     case '/user/:id':
       return axios.get(
         `${process.env.API_HOST}/api/user/get/${route.params.id}`

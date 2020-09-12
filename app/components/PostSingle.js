@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
   setUser,
+  setPost,
   setPosts,
   setMenu,
   setTags,
@@ -17,6 +18,7 @@ import Loader from './Utility/Loader';
 
 const mapStateToProps = (state) => {
   return {
+    post: state.post,
     userId: state.user.id,
     isAdmin: state.user.admin,
     userFavorites: state.user.favorites,
@@ -26,39 +28,38 @@ const mapStateToProps = (state) => {
 
 export const PostSingle = (props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [post, setPost] = useState({
-    id: props.match.params.id || '',
-    tag: [],
-    user: {
-      id: '',
-      username: '',
-    },
-  });
   const [flagPost, setFlagPost] = useState({
     show: false,
     reason: '',
   });
   useEffect(() => {
-    const url = '/api/post/single';
-    const urlSearchParams = new URLSearchParams({ id: post.id });
+    if (props.post.id === '') {
+      const url = '/api/post/single';
+      const urlSearchParams = new URLSearchParams({
+        id: props.match.params.id,
+      });
 
-    setIsLoading(true);
+      setIsLoading(true);
 
-    fetch(`${url}?${urlSearchParams}`, {
-      method: 'GET',
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setPost(res);
-        props.dispatch(setTags(tagUtil.getTagsFromPosts([res])));
+      fetch(`${url}?${urlSearchParams}`, {
+        method: 'GET',
       })
-      .catch(() => props.history.push('/404'));
+        .then((res) => res.json())
+        .then((res) => {
+          props.dispatch(setPost(res));
+          props.dispatch(setTags(tagUtil.getTagsFromPosts([res])));
+        })
+        .catch((err) => {
+          console.log(err);
+          props.history.push('/404');
+        });
+    }
   }, []);
 
   const toggleFavorite = (e) => {
     e.preventDefault();
     const url = '/api/post/favorite';
-    const urlSearchParams = new URLSearchParams({ postId: post.id });
+    const urlSearchParams = new URLSearchParams({ postId: props.post.id });
 
     fetch(`${url}?${urlSearchParams}`, {
       method: 'POST',
@@ -85,14 +86,14 @@ export const PostSingle = (props) => {
 
   const isFavorited = () => {
     for (let i = 0; i < props.userFavorites.length; i++) {
-      if (props.userFavorites[i].id === post.id) return true;
+      if (props.userFavorites[i].id === props.post.id) return true;
     }
     return false;
   };
 
   const deletePost = (e) => {
     e.preventDefault();
-    const url = `/api/post/delete/${post.id}`;
+    const url = `/api/post/delete/${props.post.id}`;
 
     fetch(url, {
       method: 'POST',
@@ -130,7 +131,7 @@ export const PostSingle = (props) => {
     } else {
       const url = '/api/post/flag/create';
       const urlSearchParams = new URLSearchParams({
-        postId: post.id,
+        postId: props.post.id,
         reason: flagPost.reason,
       });
 
@@ -203,7 +204,7 @@ export const PostSingle = (props) => {
                         <span className="text">flag post</span>
                       </button>
                     </li>
-                    {post.userId === props.userId || props.isAdmin ? (
+                    {props.post.userId === props.userId || props.isAdmin ? (
                       <li>
                         <button className="delete-post" onClick={deletePost}>
                           <span className="icon x">×</span>
@@ -218,11 +219,13 @@ export const PostSingle = (props) => {
               )}
               <p className="poster">
                 posted by:{' '}
-                <Link to={`/user/${post.user.id}`}>{post.user.username}</Link>
+                <Link to={`/user/${props.post.user.id}`}>
+                  {props.post.user.username}
+                </Link>
               </p>
             </div>
           ) : null}
-          <img onLoad={() => setIsLoading(false)} src={post.url} />
+          <img onLoad={() => setIsLoading(false)} src={props.post.url} />
         </div>
       </div>
       <FlagPost
@@ -239,6 +242,7 @@ PostSingle.propTypes = {
   dispatch: PropTypes.func.isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
+  post: PropTypes.object.isRequired,
   userId: PropTypes.number.isRequired,
   isAdmin: PropTypes.bool.isRequired,
   userFavorites: PropTypes.array.isRequired,
