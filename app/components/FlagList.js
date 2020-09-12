@@ -222,7 +222,9 @@ const FlagList = (props) => {
   const rowsPerPage = 10;
 
   useEffect(() => {
-    retrieveFlags();
+    if (!props.flags.length) {
+      retrieveFlags();
+    }
   }, []);
 
   const retrieveFlags = () => {
@@ -239,6 +241,19 @@ const FlagList = (props) => {
               };
             })
           )
+        );
+      } else {
+        props.dispatch(
+          setFlags([
+            {
+              id: 0,
+              postId: 0,
+              date: '',
+              user: { id: 0, username: '' },
+              active: true,
+              reason: '',
+            },
+          ])
         );
       }
     });
