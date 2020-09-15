@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { fetchPosts } from '../actions';
+import { fetchPosts, setTagsFromExistingPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
 import Loader from './Utility/Loader';
@@ -9,7 +9,6 @@ import Loader from './Utility/Loader';
 const mapStateToProps = (state) => {
   return {
     posts: state.posts,
-    searchQuery: state.search,
     loading: state.loading,
   };
 };
@@ -26,6 +25,7 @@ const PostList = (props) => {
     if (!props.posts.list.length) {
       retrievePosts();
     }
+    props.dispatch(setTagsFromExistingPosts());
     setLastPage(Math.ceil(props.posts.totalCount / 18));
   }, [props.posts]);
 
