@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { setPosts, setTags } from '../actions';
+import { fetchPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
-import apiUtil from '../utils/api';
-import tagUtil from '../utils/tags';
 import Loader from './Utility/Loader';
 
 const mapStateToProps = (state) => {
@@ -26,29 +24,17 @@ const PostList = (props) => {
 
   useEffect(() => {
     if (!props.posts.list.length) {
-      retrievePosts(props.posts.page);
+      retrievePosts();
     }
     setLastPage(Math.ceil(props.posts.totalCount / 18));
   }, [props.posts]);
 
-  const retrievePosts = (nextPage) => {
+  const retrievePosts = () => {
     setIsLoading(true);
     imagesLoading = 0;
     imagesLoaded = 0;
-    apiUtil.search(props.searchQuery, nextPage).then((res) => {
-      const newPosts = res.list.length
-        ? {
-            list: res.list,
-            page: nextPage,
-            totalCount: res.totalCount,
-          }
-        : { list: [false], page: 1, totalCount: 0 };
 
-      props.dispatch(setPosts(newPosts));
-      props.dispatch(
-        setTags(tagUtil.getTagsFromPosts(newPosts.list, props.searchQuery))
-      );
-    });
+    props.dispatch(fetchPosts());
   };
 
   const changePage = (page, e) => {
@@ -60,7 +46,7 @@ const PostList = (props) => {
       page = props.posts.page - 1;
     }
 
-    retrievePosts(page);
+    props.dispatch(fetchPosts({ page }));
   };
 
   if (!props.posts.list[0] && props.posts.init) {

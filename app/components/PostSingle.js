@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
   setUser,
-  setPost,
+  fetchPost,
   setPosts,
   setMenu,
   setTags,
@@ -13,7 +13,6 @@ import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import TagMenu from './TagMenu';
 import FlagPost from './FlagPost';
-import tagUtil from '../utils/tags';
 import Loader from './Utility/Loader';
 
 const mapStateToProps = (state) => {
@@ -33,26 +32,16 @@ export const PostSingle = (props) => {
     reason: '',
   });
   useEffect(() => {
+    if (isNaN(props.match.params.id)) {
+      props.history.push('/404');
+      return;
+    }
     if (props.post.id === '' || props.post.id != props.match.params.id) {
-      const url = '/api/post/single';
-      const urlSearchParams = new URLSearchParams({
-        id: props.match.params.id,
-      });
-
       setIsLoading(true);
-
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'GET',
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          props.dispatch(setPost(res));
-          props.dispatch(setTags(tagUtil.getTagsFromPosts([res])));
-        })
-        .catch((err) => {
-          console.log(err);
-          props.history.push('/404');
-        });
+      props.dispatch(fetchPost(props.match.params.id)).catch((err) => {
+        console.log(err);
+        props.history.push('/404');
+      });
     }
   }, []);
 

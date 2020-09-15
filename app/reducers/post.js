@@ -11,6 +11,8 @@ const post = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_POST':
       return action.post;
+    case 'CLEAR_POST':
+      return initialState;
     default:
       return state;
   }
