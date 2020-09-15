@@ -45,7 +45,7 @@ const PostList = (props) => {
     } else if (page === 'prev') {
       page = props.posts.page - 1;
     }
-
+    setIsLoading(true);
     props.dispatch(fetchPosts({ newPage: page }));
   };
 
