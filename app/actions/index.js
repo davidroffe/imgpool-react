@@ -1,3 +1,95 @@
+function getTagsFromPosts(posts, searchQuery) {
+  let newTags = [];
+  let exists;
+
+  if (posts[0]) {
+    for (var i = 0; i < posts.length; i++) {
+      for (var j = 0; j < posts[i].tag.length; j++) {
+        exists = false;
+        let tag = posts[i].tag[j];
+
+        for (var k = 0; k < newTags.length; k++) {
+          if (newTags[k].id === tag.id) {
+            exists = true;
+          }
+        }
+
+        if (!exists) {
+          if (searchQuery !== undefined)
+            tag.active = searchQuery.indexOf(tag.name) > -1;
+          newTags.push(tag);
+        }
+      }
+    }
+  }
+  return newTags;
+}
+
+export const clearPost = () => ({
+  type: 'CLEAR_POST',
+});
+
+export function fetchPost(id) {
+  return function(dispatch) {
+    const url = '/api/post/single';
+    const urlSearchParams = new URLSearchParams({
+      id: id,
+    });
+
+    dispatch(clearPost());
+    fetch(`${url}?${urlSearchParams}`, {
+      method: 'GET',
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        dispatch(setPost(res));
+        dispatch(setTags(getTagsFromPosts([res])));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+}
+
+export function fetchPosts(
+  { newSearchQuery, newPage } = {
+    newSearchQuery: undefined,
+    newPage: undefined,
+  }
+) {
+  return function(dispatch, getState) {
+    const page = isNaN(newPage) ? getState().posts.page : newPage;
+    const searchQuery =
+      typeof newSearchQuery === 'string' ? newSearchQuery : getState().search;
+    const url = searchQuery.length ? '/api/post/search' : '/api/post/list';
+    const urlSearchParams = new URLSearchParams({ searchQuery, page });
+
+    return fetch(`${url}?${urlSearchParams}`, {
+      method: 'GET',
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        const newPosts = res.list.length
+          ? {
+              list: res.list,
+              page,
+              totalCount: res.totalCount,
+            }
+          : { list: [false], page: 1, totalCount: 0 };
+
+        dispatch(setSearch(searchQuery));
+        dispatch(setPage(page));
+        dispatch(setPosts(newPosts));
+        dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
+      });
+  };
+}
+
+export const setPage = (page) => ({
+  type: 'SET_PAGE',
+  page,
+});
+
 export const setPost = (post) => ({
   type: 'SET_POST',
   post: { ...post },
@@ -28,7 +120,7 @@ export const toggleTag = (tag) => ({
   id: tag.id,
 });
 
-export const setSearch = (text) => ({
+const setSearch = (text) => ({
   type: 'SET_SEARCH',
   text,
 });
