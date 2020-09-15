@@ -37,7 +37,7 @@ export function fetchPost(id) {
     });
 
     dispatch(clearPost());
-    fetch(`${url}?${urlSearchParams}`, {
+    return fetch(`${url}?${urlSearchParams}`, {
       method: 'GET',
     })
       .then((res) => res.json())

@@ -38,8 +38,7 @@ export const PostSingle = (props) => {
     }
     if (props.post.id === '' || props.post.id != props.match.params.id) {
       setIsLoading(true);
-      props.dispatch(fetchPost(props.match.params.id)).catch((err) => {
-        console.log(err);
+      props.dispatch(fetchPost(props.match.params.id)).catch(() => {
         props.history.push('/404');
       });
     }
