@@ -58,7 +58,7 @@ export function fetchPosts(
   }
 ) {
   return function(dispatch, getState) {
-    const page = isNaN(newPage) ? getState().posts.page : newPage;
+    const page = isNaN(newPage) ? 1 : newPage;
     const searchQuery =
       typeof newSearchQuery === 'string' ? newSearchQuery : getState().search;
     const url = searchQuery.length ? '/api/post/search' : '/api/post/list';
