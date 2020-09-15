@@ -7,6 +7,8 @@ const posts = (
       return action.posts;
     case 'SET_POSTS_LIST':
       return { ...state, list: action.posts };
+    case 'SET_PAGE':
+      return { ...state, page: action.page };
     default:
       return state;
   }

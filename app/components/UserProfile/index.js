@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { setPosts, setSearch } from '../../actions';
+import { fetchPosts } from '../../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
-import apiUtil from '../../utils/api';
 
 const mapStateToProps = (state) => {
   return {
@@ -34,6 +33,7 @@ const Dashboard = (props) => {
   useEffect(() => {
     const url = `/api/user/get/${props.match.params.id}`;
     fetch(url, { method: 'GET' })
+      .then((res) => res.json())
       .then((res) => {
         if (res.valid) {
           setUser({
@@ -170,13 +170,8 @@ const Dashboard = (props) => {
   const handleFavoritesClick = (e) => {
     e.preventDefault();
 
-    const searchQuery = `fp:${user.id}`;
-    props.dispatch(setSearch(searchQuery));
-
-    apiUtil.search(searchQuery).then((res) => {
-      props.dispatch(
-        setPosts({ list: res, page: 1, totalCount: res.totalCount })
-      );
+    const newSearchQuery = `fp:${user.id}`;
+    props.dispatch(fetchPosts({ newSearchQuery })).then(() => {
       props.history.push('/posts');
     });
   };
@@ -184,13 +179,8 @@ const Dashboard = (props) => {
   const handlePostsClick = (e) => {
     e.preventDefault();
 
-    const searchQuery = `user:${user.id}`;
-    props.dispatch(setSearch(searchQuery));
-
-    apiUtil.search(searchQuery).then((res) => {
-      props.dispatch(
-        setPosts({ list: res, page: 1, totalCount: res.totalCount })
-      );
+    const newSearchQuery = `user:${user.id}`;
+    props.dispatch(fetchPosts({ newSearchQuery })).then(() => {
       props.history.push('/posts');
     });
   };
