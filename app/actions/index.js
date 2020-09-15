@@ -1,3 +1,12 @@
+export function setTagsFromExistingPosts() {
+  return function(dispatch, getState) {
+    const posts = getState().posts.list;
+    const searchQuery = getState().search;
+
+    dispatch(setTags(getTagsFromPosts(posts, searchQuery)));
+  };
+}
+
 function getTagsFromPosts(posts, searchQuery) {
   let newTags = [];
   let exists;
