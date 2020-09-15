@@ -46,7 +46,7 @@ const PostList = (props) => {
       page = props.posts.page - 1;
     }
 
-    props.dispatch(fetchPosts({ page }));
+    props.dispatch(fetchPosts({ newPage: page }));
   };
 
   if (!props.posts.list[0] && props.posts.init) {
