@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { fetchPosts, setTagsFromExistingPosts } from '../actions';
+import {
+  fetchPosts,
+  setTagsFromExistingPosts,
+  setPostsLoading,
+} from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
 import Loader from './Utility/Loader';
@@ -9,7 +13,6 @@ import Loader from './Utility/Loader';
 const mapStateToProps = (state) => {
   return {
     posts: state.posts,
-    loading: state.loading,
   };
 };
 
@@ -17,7 +20,6 @@ const PostList = (props) => {
   const [lastPage, setLastPage] = useState(
     Math.ceil(props.posts.totalCount / 18)
   );
-  const [isLoading, setIsLoading] = useState(false);
   let imagesLoading = 0;
   let imagesLoaded = 0;
 
@@ -30,7 +32,6 @@ const PostList = (props) => {
   }, [props.posts]);
 
   const retrievePosts = () => {
-    setIsLoading(true);
     imagesLoading = 0;
     imagesLoaded = 0;
 
@@ -45,11 +46,10 @@ const PostList = (props) => {
     } else if (page === 'prev') {
       page = props.posts.page - 1;
     }
-    setIsLoading(true);
     props.dispatch(fetchPosts({ newPage: page }));
   };
 
-  if (!props.posts.list[0] && props.posts.init) {
+  if (!props.posts.list[0] && !props.posts.loading) {
     return (
       <section id="splash">
         <div id="splash-center">
@@ -62,14 +62,15 @@ const PostList = (props) => {
       <div>
         <TagMenu />
         <section id="post-list">
-          <Loader show={isLoading} />
+          <Loader show={props.posts.loading} />
           {props.posts.list.map((post, index) => {
             imagesLoading++;
             return (
               <Link key={index} to={'/post/' + post.id} className="post-item">
                 <img
                   onLoad={() => {
-                    if (imagesLoaded + 1 === imagesLoading) setIsLoading(false);
+                    if (imagesLoaded + 1 === imagesLoading)
+                      props.dispatch(setPostsLoading(false));
                     imagesLoaded++;
                   }}
                   src={post.thumbUrl}
@@ -84,14 +85,14 @@ const PostList = (props) => {
         <aside className="paginator">
           <button
             className="previous"
-            disabled={props.posts.page < 2 || isLoading}
+            disabled={props.posts.page < 2 || props.posts.loading}
             onClick={changePage.bind(null, 'prev')}
           >
             ←
           </button>
           {props.posts.page >= 6 ? (
             <button
-              disabled={isLoading}
+              disabled={props.posts.loading}
               className="number"
               onClick={changePage.bind(null, 1)}
             >
@@ -115,7 +116,7 @@ const PostList = (props) => {
             }
           })}
           <button
-            disabled={isLoading}
+            disabled={props.posts.loading}
             className="number active"
             onClick={changePage.bind(null, props.posts.page)}
           >
@@ -127,7 +128,7 @@ const PostList = (props) => {
             if (pageLink <= lastPage) {
               return (
                 <button
-                  disabled={isLoading}
+                  disabled={props.posts.loading}
                   key={i}
                   className="number"
                   onClick={changePage.bind(null, pageLink)}
@@ -139,7 +140,7 @@ const PostList = (props) => {
           })}
           {props.posts.page <= lastPage - 6 ? (
             <button
-              disabled={isLoading}
+              disabled={props.posts.loading}
               className="number"
               onClick={changePage.bind(null, lastPage)}
             >
@@ -148,7 +149,7 @@ const PostList = (props) => {
           ) : null}
           <button
             className="next"
-            disabled={lastPage === props.posts.page || isLoading}
+            disabled={lastPage === props.posts.page || props.posts.loading}
             onClick={changePage.bind(null, 'next')}
           >
             →

@@ -73,6 +73,7 @@ export function fetchPosts(
     const url = searchQuery.length ? '/api/post/search' : '/api/post/list';
     const urlSearchParams = new URLSearchParams({ searchQuery, page });
 
+    dispatch(setPostsLoading(true));
     return fetch(`${url}?${urlSearchParams}`, {
       method: 'GET',
     })
@@ -93,6 +94,11 @@ export function fetchPosts(
       });
   };
 }
+
+export const setPostsLoading = (state) => ({
+  type: 'SET_POSTS_LOADING',
+  state,
+});
 
 export const setPage = (page) => ({
   type: 'SET_PAGE',
