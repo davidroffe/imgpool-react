@@ -18,7 +18,7 @@ const PostList = (props) => {
   );
 
   useEffect(() => {
-    if (!props.posts.list.length) {
+    if (!props.posts.list.length && !props.posts.loading) {
       props.dispatch(fetchPosts());
     }
     props.dispatch(setTagsFromExistingPosts());
