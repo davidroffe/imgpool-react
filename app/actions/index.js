@@ -81,20 +81,18 @@ export function fetchPosts(
     })
       .then((res) => res.json())
       .then((res) => {
-        setTimeout(() => {
-          const newPosts = res.list.length
-            ? {
-                list: res.list,
-                page,
-                totalCount: res.totalCount,
-                loading: false,
-              }
-            : { list: [false], page: 1, totalCount: 0, loading: false };
+        const newPosts = res.list.length
+          ? {
+              list: res.list,
+              page,
+              totalCount: res.totalCount,
+              loading: false,
+            }
+          : { list: [false], page: 1, totalCount: 0, loading: false };
 
-          dispatch(setSearch(searchQuery));
-          dispatch(setPosts(newPosts));
-          dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
-        }, 2000);
+        dispatch(setSearch(searchQuery));
+        dispatch(setPosts(newPosts));
+        dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
       });
   };
 }
