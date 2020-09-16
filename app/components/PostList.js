@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import {
-  fetchPosts,
-  setTagsFromExistingPosts,
-  setPostsLoading,
-} from '../actions';
+import { fetchPosts, setTagsFromExistingPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
 import Loader from './Utility/Loader';
@@ -20,23 +16,14 @@ const PostList = (props) => {
   const [lastPage, setLastPage] = useState(
     Math.ceil(props.posts.totalCount / 18)
   );
-  let imagesLoading = 0;
-  let imagesLoaded = 0;
 
   useEffect(() => {
     if (!props.posts.list.length) {
-      retrievePosts();
+      props.dispatch(fetchPosts());
     }
     props.dispatch(setTagsFromExistingPosts());
     setLastPage(Math.ceil(props.posts.totalCount / 18));
   }, [props.posts]);
-
-  const retrievePosts = () => {
-    imagesLoading = 0;
-    imagesLoaded = 0;
-
-    props.dispatch(fetchPosts());
-  };
 
   const changePage = (page, e) => {
     e.preventDefault();
@@ -61,27 +48,27 @@ const PostList = (props) => {
     return (
       <div>
         <TagMenu />
-        <section id="post-list">
-          <Loader show={props.posts.loading} />
-          {props.posts.list.map((post, index) => {
-            imagesLoading++;
-            return (
-              <Link key={index} to={'/post/' + post.id} className="post-item">
-                <img
-                  onLoad={() => {
-                    if (imagesLoaded + 1 === imagesLoading)
-                      props.dispatch(setPostsLoading(false));
-                    imagesLoaded++;
-                  }}
-                  src={post.thumbUrl}
-                  alt={post.tag.map((tag) => {
-                    return tag.name;
-                  })}
-                />
-              </Link>
-            );
-          })}
-        </section>
+        {props.posts.loading ? (
+          <section id="post-list">
+            <Loader show={props.posts.loading} />
+          </section>
+        ) : (
+          <section id="post-list">
+            {props.posts.list.map((post, index) => {
+              return (
+                <Link key={index} to={'/post/' + post.id} className="post-item">
+                  <img
+                    src={post.thumbUrl}
+                    alt={post.tag.map((tag) => {
+                      return tag.name;
+                    })}
+                  />
+                </Link>
+              );
+            })}
+          </section>
+        )}
+
         <aside className="paginator">
           <button
             className="previous"
@@ -107,6 +94,7 @@ const PostList = (props) => {
               return (
                 <button
                   key={i}
+                  disabled={props.posts.loading}
                   className="number"
                   onClick={changePage.bind(null, pageLink)}
                 >

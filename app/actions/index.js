@@ -73,32 +73,38 @@ export function fetchPosts(
     const url = searchQuery.length ? '/api/post/search' : '/api/post/list';
     const urlSearchParams = new URLSearchParams({ searchQuery, page });
 
+    dispatch(setPage(page));
     dispatch(setPostsLoading(true));
+
     return fetch(`${url}?${urlSearchParams}`, {
       method: 'GET',
     })
       .then((res) => res.json())
       .then((res) => {
-        const newPosts = res.list.length
-          ? {
-              list: res.list,
-              page,
-              totalCount: res.totalCount,
-            }
-          : { list: [false], page: 1, totalCount: 0 };
+        setTimeout(() => {
+          const newPosts = res.list.length
+            ? {
+                list: res.list,
+                page,
+                totalCount: res.totalCount,
+                loading: false,
+              }
+            : { list: [false], page: 1, totalCount: 0, loading: false };
 
-        dispatch(setSearch(searchQuery));
-        dispatch(setPage(page));
-        dispatch(setPosts(newPosts));
-        dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
+          dispatch(setSearch(searchQuery));
+          dispatch(setPosts(newPosts));
+          dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
+        }, 2000);
       });
   };
 }
 
-export const setPostsLoading = (state) => ({
-  type: 'SET_POSTS_LOADING',
-  state,
-});
+export const setPostsLoading = (state) => {
+  return {
+    type: 'SET_POSTS_LOADING',
+    state,
+  };
+};
 
 export const setPage = (page) => ({
   type: 'SET_PAGE',

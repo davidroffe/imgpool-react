@@ -171,18 +171,16 @@ const Dashboard = (props) => {
     e.preventDefault();
 
     const newSearchQuery = `fp:${user.id}`;
-    props.dispatch(fetchPosts({ newSearchQuery })).then(() => {
-      props.history.push('/posts');
-    });
+    props.history.push('/posts');
+    props.dispatch(fetchPosts({ newSearchQuery }));
   };
 
   const handlePostsClick = (e) => {
     e.preventDefault();
 
     const newSearchQuery = `user:${user.id}`;
-    props.dispatch(fetchPosts({ newSearchQuery })).then(() => {
-      props.history.push('/posts');
-    });
+    props.history.push('/posts');
+    props.dispatch(fetchPosts({ newSearchQuery }));
   };
 
   return (
