@@ -8,7 +8,7 @@ export default (route) => {
         .get(`${process.env.API_HOST}/api/post/list?searchQuery=&page=1`)
         .then((res) => {
           return {
-            posts: { ...res.data, page: 1, init: true },
+            posts: { ...res.data, page: 1, init: true, loading: false },
             tags: tagUtil.getTagsFromPosts(res.data.list),
           };
         });
