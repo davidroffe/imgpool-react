@@ -14,7 +14,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const Dashboard = (props) => {
+export const UserProfile = (props) => {
   const [editAccount, setEditAccount] = useState({
     show: false,
     field: '',
@@ -241,7 +241,7 @@ const Dashboard = (props) => {
                 </button>
               </div>
             ) : null}
-            <div className="row">
+            <div className="row favorites">
               <h2>Favorites</h2>
               <p>
                 {user.favorites.length}{' '}
@@ -249,7 +249,7 @@ const Dashboard = (props) => {
               </p>
               <button onClick={handleFavoritesClick}>view</button>
             </div>
-            <div className="row">
+            <div className="row posts">
               <h2>Posts</h2>
               <p>
                 {user.post.length} {`post${user.post.length > 0 ? 's' : ''}`}
@@ -304,7 +304,7 @@ const Dashboard = (props) => {
   );
 };
 
-Dashboard.propTypes = {
+UserProfile.propTypes = {
   history: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
@@ -313,4 +313,4 @@ Dashboard.propTypes = {
   admin: PropTypes.bool.isRequired,
 };
 
-export default connect(mapStateToProps)(Dashboard);
+export default connect(mapStateToProps)(UserProfile);
