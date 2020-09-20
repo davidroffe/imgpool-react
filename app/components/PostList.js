@@ -12,7 +12,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const PostList = (props) => {
+export const PostList = (props) => {
   const [lastPage, setLastPage] = useState(
     Math.ceil(props.posts.totalCount / 18)
   );
