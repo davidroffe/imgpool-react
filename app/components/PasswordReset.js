@@ -4,7 +4,7 @@ import { setUser } from '../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 
-const PasswordReset = (props) => {
+export const PasswordReset = (props) => {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const handlePasswordResetSubmit = (e) => {
