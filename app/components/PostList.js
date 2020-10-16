@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
 import Loader from './Utility/Loader';
 
+const postsPerPage = process.env.POSTS_PER_PAGE;
 const mapStateToProps = (state) => {
   return {
     posts: state.posts,
@@ -14,7 +15,7 @@ const mapStateToProps = (state) => {
 
 export const PostList = (props) => {
   const [lastPage, setLastPage] = useState(
-    Math.ceil(props.posts.totalCount / 18)
+    Math.ceil(props.posts.totalCount / postsPerPage)
   );
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export const PostList = (props) => {
       props.dispatch(fetchPosts());
     }
     props.dispatch(setTagsFromExistingPosts());
-    setLastPage(Math.ceil(props.posts.totalCount / 18));
+    setLastPage(Math.ceil(props.posts.totalCount / postsPerPage));
   }, [props.posts]);
 
   const changePage = (page, e) => {

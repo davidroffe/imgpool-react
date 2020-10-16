@@ -1,3 +1,5 @@
+const postsPerPage = process.env.POSTS_PER_PAGE;
+
 export function setTagsFromExistingPosts() {
   return function(dispatch, getState) {
     const posts = getState().posts.list;
@@ -71,7 +73,11 @@ export function fetchPosts(
     const searchQuery =
       typeof newSearchQuery === 'string' ? newSearchQuery : getState().search;
     const url = searchQuery.length ? '/api/post/search' : '/api/post/list';
-    const urlSearchParams = new URLSearchParams({ searchQuery, page });
+    const urlSearchParams = new URLSearchParams({
+      searchQuery,
+      page,
+      postsPerPage,
+    });
 
     dispatch(setPage(page));
     dispatch(setPostsLoading(true));
