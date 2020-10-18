@@ -11,6 +11,7 @@ import {
 } from '../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
+import PostOptionsMenu from './PostOptionsMenu';
 import TagMenu from './TagMenu';
 import FlagPost from './FlagPost';
 import Loader from './Utility/Loader';
@@ -156,54 +157,20 @@ export const PostSingle = (props) => {
           {!isLoading ? (
             <div className="post-info">
               {props.userId ? (
-                <div>
-                  <button
-                    className="toggle-options"
-                    onClick={toggleOptionsMenu}
-                  >
-                    options <span>+</span>
-                  </button>
-                  <ul
-                    className={`options${props.optionsMenu ? ' active' : ''}`}
-                    onClick={handleMenuClick}
-                  >
-                    <li>
-                      <button
-                        className={`toggle-fav${
-                          isFavorited() ? ' favorited' : ''
-                        }`}
-                        onClick={toggleFavorite}
-                      >
-                        <span className="icon">&hearts;</span>
-                        <span className="text add">add to favorites</span>
-                        <span className="text remove">
-                          remove from favorites
-                        </span>
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        className="flag-post"
-                        onClick={() => {
-                          setFlagPost({ ...flagPost, show: true });
-                        }}
-                      >
-                        <span className="icon flag">&#9873;</span>
-                        <span className="text">flag post</span>
-                      </button>
-                    </li>
-                    {props.post.userId === props.userId || props.isAdmin ? (
-                      <li>
-                        <button className="delete-post" onClick={deletePost}>
-                          <span className="icon x">×</span>
-                          <span className="text">delete post</span>
-                        </button>
-                      </li>
-                    ) : null}
-                  </ul>
-                </div>
+                <PostOptionsMenu
+                  toggleMenu={toggleOptionsMenu}
+                  optionsMenu={props.optionsMenu}
+                  handleMenuClick={handleMenuClick}
+                  isFavorited={isFavorited()}
+                  toggleFavorite={toggleFavorite}
+                  setFlagPost={setFlagPost}
+                  flagPost={flagPost}
+                  deletePost={deletePost}
+                  isUploader={props.post.userId === props.userId}
+                  isAdmin={props.isAdmin}
+                />
               ) : (
-                <div></div>
+                <div />
               )}
               <p className="poster">
                 posted by:{' '}
