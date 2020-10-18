@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { setUser } from '../actions';
+import { login, signup, resetPassword } from '../actions';
 import { ToastContainer, toast } from 'react-toastify';
 
 const mapStateToProps = (state) => {
@@ -16,6 +16,10 @@ const mapStateToProps = (state) => {
 };
 
 export const Login = (props) => {
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [form, setForm] = useState('login');
   const [canSignUp, setCanSignUp] = useState(true);
 
@@ -47,79 +51,40 @@ export const Login = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    let recaptchaResponse = '';
-    let newErrorMessage = [];
-    let url;
-
-    const { email, username, password, passwordConfirm } = props;
+    let processing;
 
     switch (form) {
       case 'login':
-        url = '/api/user/login';
+        processing = props.dispatch(login(email, password)).then(() => {
+          props.history.push('/account');
+        });
         break;
       case 'signUp':
-        url = '/api/user/signup';
-        recaptchaResponse = window.grecaptcha.getResponse();
+        processing = props
+          .dispatch(signup(email, username, password, passwordConfirm))
+          .then(() => {
+            props.history.push('/account');
+          });
         break;
       case 'forgotPassword':
-        url = '/api/user/password-reset';
+        processing = props
+          .dispatch(resetPassword(email))
+          .then((res) => res.json())
+          .then(() => {
+            toast.success('An email has been sent.');
+          });
         break;
     }
 
-    if (email === undefined || email === '') {
-      newErrorMessage.push('Please enter an email.');
-    }
-    if (form === 'login' || form === 'signUp') {
-      if (password === undefined || password === '') {
-        newErrorMessage.push('Please enter a password.');
-      }
-    }
-    if (form === 'signUp') {
-      if (password !== passwordConfirm) {
-        newErrorMessage.push('Passwords do not match.');
-      }
-      if (password.length < 8) {
-        newErrorMessage.push('Password must be at least 8 characters.');
-      }
-    }
-    if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach((error) => {
-        toast.error(error);
-      });
-    } else {
-      const urlSeachParams = new URLSearchParams({
-        email: email,
-        username: username,
-        password: password,
-        passwordConfirm: passwordConfirm,
-        recaptchaResponse,
-      });
-      fetch(`${url}?${urlSeachParams}`, {
-        method: 'POST',
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          if (form === 'forgotPassword') {
-            toast.success('An email has been sent.');
-          } else {
-            props.dispatch(setUser('email', res.email));
-            props.dispatch(setUser('username', res.username));
-            props.dispatch(setUser('loggedIn', true));
-            props.dispatch(setUser('admin', res.admin));
-            props.history.push('/account');
-          }
-        })
-        .catch((error) => {
-          toast.error(error);
+    processing.catch((error) => {
+      if (Array.isArray(error)) {
+        error.forEach((errorItem) => {
+          toast.error(errorItem);
         });
-    }
-  };
-
-  const handleChange = (e) => {
-    const field = e.target.id;
-    const value = e.target.value;
-
-    props.dispatch(setUser(field, value));
+      } else {
+        toast.error(error);
+      }
+    });
   };
 
   const switchForm = (e) => {
@@ -144,9 +109,9 @@ export const Login = (props) => {
               type={'text'}
               title={'Full Name'}
               name={'email'}
-              value={props.email}
+              value={email}
               placeholder={'EMAIL'}
-              onChange={handleChange}
+              onChange={(e) => setEmail(e.target.value)}
             />
             {form === 'signUp' ? (
               <input
@@ -155,9 +120,9 @@ export const Login = (props) => {
                 type={'text'}
                 title={'Username'}
                 name={'username'}
-                value={props.username}
+                value={username}
                 placeholder={'USERNAME'}
-                onChange={handleChange}
+                onChange={(e) => setUsername(e.target.value)}
               />
             ) : null}
             {form === 'signUp' || form === 'login' ? (
@@ -167,9 +132,9 @@ export const Login = (props) => {
                 type={'password'}
                 title={'Password'}
                 name={'password'}
-                value={props.password}
+                value={password}
                 placeholder={'PASSWORD'}
-                onChange={handleChange}
+                onChange={(e) => setPassword(e.target.value)}
               />
             ) : null}
             {form === 'signUp' ? (
@@ -179,9 +144,9 @@ export const Login = (props) => {
                 type={'password'}
                 title={'password-confirm'}
                 name={'password-confirm'}
-                value={props.passwordConfirm}
+                value={passwordConfirm}
                 placeholder={'CONFIRM PASSWORD'}
-                onChange={handleChange}
+                onChange={(e) => setPasswordConfirm(e.target.value)}
               />
             ) : null}
           </div>

@@ -103,6 +103,109 @@ export function fetchPosts(
   };
 }
 
+export const signUp = (email, username, password, passwordConfirm) => (
+  dispatch
+) => {
+  const recaptchaResponse = window.grecaptcha.getResponse();
+  const url = '/api/user/signup';
+  const newErrorMessage = [];
+
+  if (email === undefined || email === '') {
+    newErrorMessage.push('Please enter an email.');
+  }
+  if (password === undefined || password === '') {
+    newErrorMessage.push('Please enter a password.');
+  }
+  if (password !== passwordConfirm) {
+    newErrorMessage.push('Passwords do not match.');
+  }
+  if (password.length < 8) {
+    newErrorMessage.push('Password must be at least 8 characters.');
+  }
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    const urlSeachParams = new URLSearchParams({
+      email: email,
+      username: username,
+      password: password,
+      passwordConfirm: passwordConfirm,
+      recaptchaResponse,
+    });
+    return fetch(`${url}?${urlSeachParams}`, {
+      method: 'POST',
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        try {
+          const user = JSON.parse(res);
+
+          dispatch(setUser('email', user.email));
+          dispatch(setUser('username', user.username));
+          dispatch(setUser('loggedIn', true));
+          dispatch(setUser('admin', user.admin));
+        } catch (error) {
+          throw res;
+        }
+      });
+  }
+};
+
+export const login = (email, password) => (dispatch) => {
+  let newErrorMessage = [];
+  const url = '/api/user/login';
+
+  if (email === undefined || email === '') {
+    newErrorMessage.push('Please enter an email.');
+  }
+  if (password === undefined || password === '') {
+    newErrorMessage.push('Please enter a password.');
+  }
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    const urlSeachParams = new URLSearchParams({
+      email: email,
+      password: password,
+    });
+    return fetch(`${url}?${urlSeachParams}`, {
+      method: 'POST',
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        try {
+          const user = JSON.parse(res);
+
+          dispatch(setUser('email', user.email));
+          dispatch(setUser('username', user.username));
+          dispatch(setUser('loggedIn', true));
+          dispatch(setUser('admin', user.admin));
+        } catch (error) {
+          throw res;
+        }
+      });
+  }
+};
+
+export const resetPassword = (email) => () => {
+  const newErrorMessage = [];
+  const url = '/api/user/password-reset';
+
+  if (email === undefined || email === '') {
+    newErrorMessage.push('Please enter an email.');
+  }
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    const urlSeachParams = new URLSearchParams({
+      email: email,
+    });
+    return fetch(`${url}?${urlSeachParams}`, {
+      method: 'POST',
+    });
+  }
+};
+
 export const setPostsLoading = (state) => {
   return {
     type: 'SET_POSTS_LOADING',
