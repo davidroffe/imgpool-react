@@ -18,7 +18,7 @@ const PostListItem = ({ id, thumbUrl, tags }) => {
 PostListItem.propTypes = {
   id: PropTypes.number.isRequired,
   thumbUrl: PropTypes.string.isRequired,
-  tags: PropTypes.object.isRequired,
+  tags: PropTypes.array.isRequired,
 };
 
 export default PostListItem;
