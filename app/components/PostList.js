@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { fetchPosts, setTagsFromExistingPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
+import Paginator from './Paginator';
 import Loader from './Utility/Loader';
 
 const postsPerPage = process.env.POSTS_PER_PAGE;
@@ -69,81 +70,12 @@ export const PostList = (props) => {
             })}
           </section>
         )}
-
-        <aside className="paginator">
-          <button
-            className="previous"
-            disabled={props.posts.page < 2 || props.posts.loading}
-            onClick={changePage.bind(null, 'prev')}
-          >
-            ←
-          </button>
-          {props.posts.page >= 6 ? (
-            <button
-              disabled={props.posts.loading}
-              className="number"
-              onClick={changePage.bind(null, 1)}
-            >
-              1
-            </button>
-          ) : null}
-
-          {[...Array(5)].map((el, i) => {
-            const pageLink = props.posts.page - (i + 1);
-
-            if (pageLink > 0) {
-              return (
-                <button
-                  key={i}
-                  disabled={props.posts.loading}
-                  className="number"
-                  onClick={changePage.bind(null, pageLink)}
-                >
-                  {pageLink}
-                </button>
-              );
-            }
-          })}
-          <button
-            disabled={props.posts.loading}
-            className="number active"
-            onClick={changePage.bind(null, props.posts.page)}
-          >
-            {props.posts.page}
-          </button>
-          {[...Array(5)].map((el, i) => {
-            const pageLink = props.posts.page + (i + 1);
-
-            if (pageLink <= lastPage) {
-              return (
-                <button
-                  disabled={props.posts.loading}
-                  key={i}
-                  className="number"
-                  onClick={changePage.bind(null, pageLink)}
-                >
-                  {pageLink}
-                </button>
-              );
-            }
-          })}
-          {props.posts.page <= lastPage - 6 ? (
-            <button
-              disabled={props.posts.loading}
-              className="number"
-              onClick={changePage.bind(null, lastPage)}
-            >
-              {lastPage}
-            </button>
-          ) : null}
-          <button
-            className="next"
-            disabled={lastPage === props.posts.page || props.posts.loading}
-            onClick={changePage.bind(null, 'next')}
-          >
-            →
-          </button>
-        </aside>
+        <Paginator
+          changePage={changePage}
+          page={props.posts.page}
+          lastPage={lastPage}
+          loading={props.posts.loading}
+        />
       </div>
     );
   }
