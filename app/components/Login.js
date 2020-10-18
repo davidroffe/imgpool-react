@@ -15,7 +15,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-export const Login = (props) => {
+export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -34,8 +34,8 @@ export const Login = (props) => {
   }, []);
 
   useEffect(() => {
-    if (props.userInit && props.isLoggedIn) {
-      props.history.push('/account');
+    if (userInit && isLoggedIn) {
+      history.push('/account');
     }
   });
 
@@ -55,20 +55,19 @@ export const Login = (props) => {
 
     switch (form) {
       case 'login':
-        processing = props.dispatch(login(email, password)).then(() => {
-          props.history.push('/account');
+        processing = dispatch(login(email, password)).then(() => {
+          history.push('/account');
         });
         break;
       case 'signUp':
-        processing = props
-          .dispatch(signup(email, username, password, passwordConfirm))
-          .then(() => {
-            props.history.push('/account');
-          });
+        processing = dispatch(
+          signup(email, username, password, passwordConfirm)
+        ).then(() => {
+          history.push('/account');
+        });
         break;
       case 'forgotPassword':
-        processing = props
-          .dispatch(resetPassword(email))
+        processing = dispatch(resetPassword(email))
           .then((res) => res.json())
           .then(() => {
             toast.success('An email has been sent.');
