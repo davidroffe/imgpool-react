@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { fetchPosts, setTagsFromExistingPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
 import Paginator from './Paginator';
+import PostListItem from './PostListItem';
 import Loader from './Utility/Loader';
 
 const postsPerPage = process.env.POSTS_PER_PAGE;
@@ -56,16 +56,14 @@ export const PostList = (props) => {
           </section>
         ) : (
           <section id="post-list">
-            {props.posts.list.map((post, index) => {
+            {props.posts.list.map((post) => {
               return (
-                <Link key={index} to={'/post/' + post.id} className="post-item">
-                  <img
-                    src={post.thumbUrl}
-                    alt={post.tag.map((tag) => {
-                      return tag.name;
-                    })}
-                  />
-                </Link>
+                <PostListItem
+                  key={post.id}
+                  id={post.id}
+                  thumbUrl={post.thumbUrl}
+                  tags={post.tag}
+                />
               );
             })}
           </section>
