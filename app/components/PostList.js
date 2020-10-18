@@ -14,31 +14,31 @@ const mapStateToProps = (state) => {
   };
 };
 
-export const PostList = (props) => {
+export const PostList = ({ posts, dispatch }) => {
   const [lastPage, setLastPage] = useState(
-    Math.ceil(props.posts.totalCount / postsPerPage)
+    Math.ceil(posts.totalCount / postsPerPage)
   );
 
   useEffect(() => {
-    if (!props.posts.list.length && !props.posts.loading) {
-      props.dispatch(fetchPosts());
+    if (!posts.list.length && !posts.loading) {
+      dispatch(fetchPosts());
     }
-    props.dispatch(setTagsFromExistingPosts());
-    setLastPage(Math.ceil(props.posts.totalCount / postsPerPage));
-  }, [props.posts]);
+    dispatch(setTagsFromExistingPosts());
+    setLastPage(Math.ceil(posts.totalCount / postsPerPage));
+  }, [posts]);
 
   const changePage = (page, e) => {
     e.preventDefault();
 
     if (page === 'next') {
-      page = props.posts.page + 1;
+      page = posts.page + 1;
     } else if (page === 'prev') {
-      page = props.posts.page - 1;
+      page = posts.page - 1;
     }
-    props.dispatch(fetchPosts({ newPage: page }));
+    dispatch(fetchPosts({ newPage: page }));
   };
 
-  if (!props.posts.list[0] && !props.posts.loading) {
+  if (!posts.list[0] && !posts.loading) {
     return (
       <section id="splash">
         <div id="splash-center">
@@ -50,13 +50,13 @@ export const PostList = (props) => {
     return (
       <div>
         <TagMenu />
-        {props.posts.loading ? (
+        {posts.loading ? (
           <section id="post-list">
-            <Loader show={props.posts.loading} />
+            <Loader show={posts.loading} />
           </section>
         ) : (
           <section id="post-list">
-            {props.posts.list.map((post) => {
+            {posts.list.map((post) => {
               return (
                 <PostListItem
                   key={post.id}
@@ -70,9 +70,9 @@ export const PostList = (props) => {
         )}
         <Paginator
           changePage={changePage}
-          page={props.posts.page}
+          page={posts.page}
           lastPage={lastPage}
-          loading={props.posts.loading}
+          loading={posts.loading}
         />
       </div>
     );
