@@ -6,6 +6,7 @@ import TagMenu from './TagMenu';
 import Paginator from './Paginator';
 import PostListItem from './PostListItem';
 import Loader from './Utility/Loader';
+import Splash from './Splash';
 
 const postsPerPage = process.env.POSTS_PER_PAGE;
 const mapStateToProps = (state) => {
@@ -39,13 +40,7 @@ export const PostList = ({ posts, dispatch }) => {
   };
 
   if (!posts.list[0] && !posts.loading) {
-    return (
-      <section id="splash">
-        <div id="splash-center">
-          <h1>IMGPOOL</h1>
-        </div>
-      </section>
-    );
+    return <Splash />;
   } else {
     return (
       <div>
