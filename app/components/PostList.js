@@ -8,7 +8,6 @@ import PostListItem from './PostListItem';
 import Loader from './Utility/Loader';
 import Splash from './Splash';
 
-const postsPerPage = process.env.POSTS_PER_PAGE;
 const mapStateToProps = (state) => {
   return {
     posts: state.posts,
@@ -16,6 +15,7 @@ const mapStateToProps = (state) => {
 };
 
 export const PostList = ({ posts, dispatch }) => {
+  const postsPerPage = process.env.POSTS_PER_PAGE;
   const [lastPage, setLastPage] = useState(
     Math.ceil(posts.totalCount / postsPerPage)
   );
