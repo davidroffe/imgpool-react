@@ -56,7 +56,7 @@ export function getPosts(
     dispatch(setPage(page));
     dispatch(setPostsLoading(true));
 
-    fetchPosts(searchQuery, page, postsPerPage).then((res) => {
+    return fetchPosts(searchQuery, page, postsPerPage).then((res) => {
       const newPosts = res.list.length
         ? {
             list: res.list,
