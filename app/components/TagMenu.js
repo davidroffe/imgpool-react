@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getPosts, setMenu, closeAllMenusExcept } from '../actions';
 import TagMenuItem from './TagMenuItem';
+import BurgerButton from './Utility/BurgerButton';
 
 const mapStateToProps = (state) => {
   return {
@@ -64,14 +65,7 @@ export const TagMenu = (props) => {
           ))}
         </nav>
       </div>
-      <button className="tab" onClick={toggleMenu}>
-        <span className="burger">
-          <span className="line"></span>
-          <span className="line"></span>
-          <span className="line"></span>
-        </span>
-        <span className="text">View Tags</span>
-      </button>
+      <BurgerButton onClick={toggleMenu} />
     </aside>
   );
 };
