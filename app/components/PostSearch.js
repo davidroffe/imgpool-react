@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { fetchPosts } from '../actions';
+import { getPosts } from '../actions';
 
 const mapStateToProps = (state) => {
   return { searchQuery: state.search };
@@ -17,7 +17,7 @@ export const PostSearch = (props) => {
   }, [props.searchQuery]);
   const handleSubmit = (e) => {
     e.preventDefault();
-    props.dispatch(fetchPosts({ newSearchQuery: searchField })).then(() => {
+    props.dispatch(getPosts({ newSearchQuery: searchField })).then(() => {
       props.history.push('/posts');
     });
   };

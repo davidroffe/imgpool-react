@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { fetchPosts } from '../../actions';
+import { getPosts } from '../../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
@@ -172,7 +172,7 @@ export const UserProfile = (props) => {
 
     const newSearchQuery = `fp:${user.id}`;
     props.history.push('/posts');
-    props.dispatch(fetchPosts({ newSearchQuery }));
+    props.dispatch(getPosts({ newSearchQuery }));
   };
 
   const handlePostsClick = (e) => {
@@ -180,7 +180,7 @@ export const UserProfile = (props) => {
 
     const newSearchQuery = `user:${user.id}`;
     props.history.push('/posts');
-    props.dispatch(fetchPosts({ newSearchQuery }));
+    props.dispatch(getPosts({ newSearchQuery }));
   };
 
   return (

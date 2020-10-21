@@ -1,3 +1,5 @@
+import { fetchPosts } from '../api/posts';
+
 const postsPerPage = process.env.POSTS_PER_PAGE;
 
 export function setTagsFromExistingPosts() {
@@ -62,7 +64,7 @@ export function fetchPost(id) {
   };
 }
 
-export function fetchPosts(
+export function getPosts(
   { newSearchQuery, newPage } = {
     newSearchQuery: undefined,
     newPage: undefined,
@@ -72,34 +74,24 @@ export function fetchPosts(
     const page = isNaN(newPage) ? 1 : newPage;
     const searchQuery =
       typeof newSearchQuery === 'string' ? newSearchQuery : getState().search;
-    const url = searchQuery.length ? '/api/post/search' : '/api/post/list';
-    const urlSearchParams = new URLSearchParams({
-      searchQuery,
-      page,
-      postsPerPage,
-    });
 
     dispatch(setPage(page));
     dispatch(setPostsLoading(true));
 
-    return fetch(`${url}?${urlSearchParams}`, {
-      method: 'GET',
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        const newPosts = res.list.length
-          ? {
-              list: res.list,
-              page,
-              totalCount: res.totalCount,
-              loading: false,
-            }
-          : { list: [false], page: 1, totalCount: 0, loading: false };
+    fetchPosts(searchQuery, page, postsPerPage).then((res) => {
+      const newPosts = res.list.length
+        ? {
+            list: res.list,
+            page,
+            totalCount: res.totalCount,
+            loading: false,
+          }
+        : { list: [false], page: 1, totalCount: 0, loading: false };
 
-        dispatch(setSearch(searchQuery));
-        dispatch(setPosts(newPosts));
-        dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
-      });
+      dispatch(setSearch(searchQuery));
+      dispatch(setPosts(newPosts));
+      dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
+    });
   };
 }
 

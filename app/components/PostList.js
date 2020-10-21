@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { fetchPosts, setTagsFromExistingPosts } from '../actions';
+import { getPosts, setTagsFromExistingPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
 import Paginator from './Paginator';
@@ -22,7 +22,7 @@ export const PostList = ({ posts, dispatch }) => {
 
   useEffect(() => {
     if (!posts.list.length && !posts.loading) {
-      dispatch(fetchPosts());
+      dispatch(getPosts());
     }
     dispatch(setTagsFromExistingPosts());
     setLastPage(Math.ceil(posts.totalCount / postsPerPage));
@@ -36,7 +36,7 @@ export const PostList = ({ posts, dispatch }) => {
     } else if (page === 'prev') {
       page = posts.page - 1;
     }
-    dispatch(fetchPosts({ newPage: page }));
+    dispatch(getPosts({ newPage: page }));
   };
 
   if (!posts.list[0] && !posts.loading) {

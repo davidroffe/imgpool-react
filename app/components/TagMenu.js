@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { fetchPosts, setMenu, closeAllMenusExcept } from '../actions';
+import { getPosts, setMenu, closeAllMenusExcept } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
@@ -45,7 +45,7 @@ export const TagMenu = (props) => {
     newSearchQuery =
       newSearchQuery.length > 1 ? newSearchQuery.join(' ') : newSearchQuery[0];
 
-    props.dispatch(fetchPosts({ newSearchQuery })).then(() => {
+    props.dispatch(getPosts({ newSearchQuery })).then(() => {
       props.history.push('/posts');
     });
   };
