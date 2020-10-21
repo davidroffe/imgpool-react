@@ -21,3 +21,13 @@ export const fetchPost = (id) => {
     method: 'GET',
   }).then((res) => res.json());
 };
+
+export default {
+  deletePost: (id) => {
+    const url = `/api/post/delete/${id}`;
+
+    return fetch(url, {
+      method: 'POST',
+    });
+  },
+};

@@ -1,4 +1,5 @@
 import { fetchPosts, fetchPost } from '../api/posts';
+import postApi from '../api/posts';
 import { getTagsFromPosts } from '../utils/tags';
 import userApi from '../api/users';
 
@@ -31,6 +32,14 @@ export function getPost(id) {
       });
   };
 }
+
+export const deletePost = (id) => (dispatch) => {
+  return postApi.deletePost(id).then((res) => {
+    dispatch(setUser('favorites', res.favorites));
+    dispatch(setPosts({ posts: [], page: 1, totalCount: 0 }));
+    dispatch(setTags([]));
+  });
+};
 
 export function getPosts(
   { newSearchQuery, newPage } = {

@@ -3,10 +3,9 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
   setFavorite,
+  deletePost,
   getPost,
-  setPosts,
   setMenu,
-  setTags,
   closeAllMenusExcept,
 } from '../actions';
 import PropTypes from 'prop-types';
@@ -82,17 +81,12 @@ export const PostSingle = ({
     return false;
   };
 
-  const deletePost = (e) => {
+  const handleDeletePost = (e) => {
     e.preventDefault();
-    const url = `/api/post/delete/${post.id}`;
 
-    fetch(url, {
-      method: 'POST',
-    })
+    dispatch(deletePost(post.id))
       .then(() => {
         toast.success('Post deleted.');
-        dispatch(setPosts({ posts: [], page: 1, totalCount: 0 }));
-        dispatch(setTags([]));
         history.push('/posts');
       })
       .catch((error) => {
@@ -167,7 +161,7 @@ export const PostSingle = ({
                   toggleFavorite={toggleFavorite}
                   setFlagPost={setFlagPost}
                   flagPost={flagPost}
-                  deletePost={deletePost}
+                  deletePost={handleDeletePost}
                   isUploader={post.userId === userId}
                   isAdmin={isAdmin}
                 />
