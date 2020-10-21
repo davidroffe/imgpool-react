@@ -1,4 +1,4 @@
-import { fetchPosts } from '../api/posts';
+import { fetchPosts, fetchPost } from '../api/posts';
 import { getTagsFromPosts } from '../utils/tags';
 
 const postsPerPage = process.env.POSTS_PER_PAGE;
@@ -16,18 +16,11 @@ export const clearPost = () => ({
   type: 'CLEAR_POST',
 });
 
-export function fetchPost(id) {
+export function getPost(id) {
   return function(dispatch) {
-    const url = '/api/post/single';
-    const urlSearchParams = new URLSearchParams({
-      id: id,
-    });
-
     dispatch(clearPost());
-    return fetch(`${url}?${urlSearchParams}`, {
-      method: 'GET',
-    })
-      .then((res) => res.json())
+
+    return fetchPost(id)
       .then((res) => {
         dispatch(setPost(res));
         dispatch(setTags(getTagsFromPosts([res])));

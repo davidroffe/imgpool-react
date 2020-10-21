@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
   setUser,
-  fetchPost,
+  getPost,
   setPosts,
   setMenu,
   setTags,
@@ -48,7 +48,7 @@ export const PostSingle = ({
     }
     if (post.id === '' || post.id != match.params.id) {
       setIsLoading(true);
-      dispatch(fetchPost(match.params.id)).catch(() => {
+      dispatch(getPost(match.params.id)).catch(() => {
         history.push('/404');
       });
     }
