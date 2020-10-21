@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
-  setUser,
+  setFavorite,
   getPost,
   setPosts,
   setMenu,
@@ -56,19 +56,12 @@ export const PostSingle = ({
 
   const toggleFavorite = (e) => {
     e.preventDefault();
-    const url = '/api/post/favorite';
-    const urlSearchParams = new URLSearchParams({ postId: post.id });
 
-    fetch(`${url}?${urlSearchParams}`, {
-      method: 'POST',
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        toast.success(
-          `Post ${isFavorited() ? 'removed from' : 'added to'} favorites.`
-        );
-        dispatch(setUser('favorites', res.favorites));
-      });
+    dispatch(setFavorite(post.id)).then(() => {
+      toast.success(
+        `Post ${isFavorited() ? 'removed from' : 'added to'} favorites.`
+      );
+    });
   };
 
   const handleMenuClick = (e) => {

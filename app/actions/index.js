@@ -1,5 +1,6 @@
 import { fetchPosts, fetchPost } from '../api/posts';
 import { getTagsFromPosts } from '../utils/tags';
+import userApi from '../api/users';
 
 const postsPerPage = process.env.POSTS_PER_PAGE;
 
@@ -227,6 +228,12 @@ export const setUser = (field, value) => ({
   type: `SET_${field.toUpperCase()}`,
   value,
 });
+
+export const setFavorite = (id) => (dispatch) => {
+  return userApi.setFavorite(id).then((res) => {
+    dispatch(setUser('favorites', res.favorites));
+  });
+};
 
 export const clearUser = () => ({
   type: 'CLEAR_USER',
