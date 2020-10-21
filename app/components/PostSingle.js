@@ -6,6 +6,7 @@ import {
   deletePost,
   getPost,
   setMenu,
+  createPostFlag,
   closeAllMenusExcept,
 } from '../actions';
 import PropTypes from 'prop-types';
@@ -114,16 +115,7 @@ export const PostSingle = ({
         toast.error(error);
       });
     } else {
-      const url = '/api/post/flag/create';
-      const urlSearchParams = new URLSearchParams({
-        postId: post.id,
-        reason: flagPost.reason,
-      });
-
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'POST',
-      })
-        .then((res) => res.json())
+      dispatch(createPostFlag(post.id, flagPost.reason))
         .then((res) => {
           if (res.status === 'success') {
             setFlagPost({

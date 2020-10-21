@@ -2,6 +2,7 @@ import { fetchPosts, fetchPost } from '../api/posts';
 import postApi from '../api/posts';
 import { getTagsFromPosts } from '../utils/tags';
 import userApi from '../api/users';
+import flagApi from '../api/flags';
 
 const postsPerPage = process.env.POSTS_PER_PAGE;
 
@@ -211,6 +212,10 @@ export const setFlags = (flags) => ({
   type: 'SET_FLAGS',
   flags,
 });
+
+export const createPostFlag = (postId, reason) => () => {
+  return flagApi.createPostFlag(postId, reason);
+};
 
 export const toggleTag = (tag) => ({
   type: 'TOGGLE_TAG',
