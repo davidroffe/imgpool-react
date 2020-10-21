@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { login, signup, resetPassword } from '../actions';
+import { login, signUp, resetPassword } from '../actions';
 import { ToastContainer, toast } from 'react-toastify';
 
 const mapStateToProps = (state) => {
@@ -61,7 +61,7 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
         break;
       case 'signUp':
         processing = dispatch(
-          signup(email, username, password, passwordConfirm)
+          signUp(email, username, password, passwordConfirm)
         ).then(() => {
           history.push('/account');
         });
