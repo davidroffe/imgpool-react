@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
+import userApi from '../../api/users';
 
 const mapStateToProps = (state) => {
   return {
@@ -31,9 +32,8 @@ export const UserProfile = (props) => {
     bio: '',
   });
   useEffect(() => {
-    const url = `/api/user/get/${props.match.params.id}`;
-    fetch(url, { method: 'GET' })
-      .then((res) => res.json())
+    userApi
+      .getUser(props.match.params.id)
       .then((res) => {
         if (res.valid) {
           setUser({
