@@ -1,5 +1,5 @@
 import axios from 'axios';
-import tagUtil from '../app/utils/tags';
+import { getTagsFromPosts } from '../app/utils/tags';
 
 export default (route) => {
   switch (route.path) {
@@ -9,14 +9,14 @@ export default (route) => {
         .then((res) => {
           return {
             posts: { ...res.data, page: 1, init: true, loading: false },
-            tags: tagUtil.getTagsFromPosts(res.data.list),
+            tags: getTagsFromPosts(res.data.list),
           };
         });
     case '/post/:id':
       return axios
         .get(`${process.env.API_HOST}/api/post/single?id=${route.params.id}`)
         .then((res) => {
-          return { post: res.data, tags: tagUtil.getTagsFromPosts([res.data]) };
+          return { post: res.data, tags: getTagsFromPosts([res.data]) };
         });
     case '/user/:id':
       return axios.get(
