@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getPosts, setMenu, closeAllMenusExcept } from '../actions';
+import TagMenuItem from './TagMenuItem';
 
 const mapStateToProps = (state) => {
   return {
@@ -54,19 +55,13 @@ export const TagMenu = (props) => {
     <aside id="tag-menu" className={props.showMenu ? 'active' : ''}>
       <div className="body" onClick={handleMenuClick}>
         <nav>
-          {props.tags.map((tag, index) => {
-            return (
-              <Link
-                key={index}
-                to={'post?tag=' + tag.id}
-                className={'tag ' + tag.active}
-                onClick={handleTagClick.bind(this, tag)}
-                active={tag.active ? '' : null}
-              >
-                {tag.name}
-              </Link>
-            );
-          })}
+          {props.tags.map((tag, index) => (
+            <TagMenuItem
+              key={index}
+              tag={tag}
+              handleTagClick={handleTagClick}
+            />
+          ))}
         </nav>
       </div>
       <button className="tab" onClick={toggleMenu}>
