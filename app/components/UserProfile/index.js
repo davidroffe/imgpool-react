@@ -94,6 +94,7 @@ export const UserProfile = (props) => {
         .then((res) => {
           setUser((user) => {
             if (res.status === 'success') {
+              toast.success('Edit successful.');
               return {
                 ...user,
                 email: res.email,

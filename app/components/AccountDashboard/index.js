@@ -113,6 +113,7 @@ const Dashboard = ({
         .then((res) => {
           if (res.status === 'success') {
             clearValues();
+            toast.success('Edit successful.');
           }
         })
         .catch((error) => {
