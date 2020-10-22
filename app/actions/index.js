@@ -176,6 +176,32 @@ export const resetPassword = (email) => () => {
   }
 };
 
+export const editUser = (id, editAccount, email) => (dispatch) => {
+  const url = '/api/user/edit/' + (id || '');
+  const urlSearchParams = new URLSearchParams({
+    currentEmail: email,
+    editField: editAccount.field,
+    email: editAccount.email,
+    username: editAccount.username,
+    bio: editAccount.bio,
+    password: editAccount.password,
+    passwordConfirm: editAccount.passwordConfirm,
+  });
+
+  return fetch(`${url}?${urlSearchParams}`, {
+    method: 'post',
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res.status === 'success') {
+        dispatch(setUser('email', res.email));
+        dispatch(setUser('username', res.username));
+        dispatch(setUser('bio', res.bio));
+      }
+      return res;
+    });
+};
+
 export const setPostsLoading = (state) => {
   return {
     type: 'SET_POSTS_LOADING',
