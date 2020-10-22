@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { getPosts } from '../../actions';
+import { getPosts, editUser } from '../../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
 import userApi from '../../api/users';
+import validate from '../../utils/validate';
 
 const mapStateToProps = (state) => {
   return {
@@ -74,67 +75,29 @@ export const UserProfile = (props) => {
   const handleEditSubmit = (e) => {
     e.preventDefault();
 
-    const url = `/api/user/edit/${user.id}`;
-    let newErrorMessage = [];
+    const newErrorMessage = validate.editForm(
+      editAccount,
+      user.email,
+      user.username
+    );
 
-    if (editAccount.field === 'edit-email') {
-      if (editAccount.email === undefined || editAccount.email === '') {
-        newErrorMessage.push('Please enter an email.');
-      } else if (editAccount.email === user.email) {
-        newErrorMessage.push('Please use a different email.');
-      }
-    }
-    if (editAccount.field === 'edit-username') {
-      if (editAccount.username === undefined || editAccount.username === '') {
-        newErrorMessage.push('Please enter a username.');
-      } else if (editAccount.username === user.username) {
-        newErrorMessage.push('Please use a different username.');
-      }
-    }
-    if (editAccount.field === 'edit-bio') {
-      if (editAccount.bio === undefined) {
-        newErrorMessage.push('Error with bio.');
-      }
-    }
     if (newErrorMessage.length > 0) {
       newErrorMessage.forEach((error) => {
         toast.error(error);
       });
     } else {
-      const urlSearchParams = new URLSearchParams({
-        currentEmail: user.email,
-        editField: editAccount.field,
-        email: editAccount.email,
-        username: editAccount.username,
-        bio: editAccount.bio,
-      });
-
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'POST',
-      })
-        .then((res) => res.json())
+      props
+        .dispatch(editUser(user.id, editAccount, user.email))
         .then((res) => {
-          if (res.status === 'success') {
-            setUser({
-              ...user,
-              email: res.email,
-              username: res.username,
-              bio: res.bio,
-            });
-
-            setEditAccount({
-              show: false,
-              field: '',
-              email: '',
-              username: '',
-              bio: '',
-              password: '',
-              passwordConfirm: '',
-            });
-          }
+          setUser((user) => ({
+            ...user,
+            email: res.email,
+            username: res.username,
+            bio: res.bio,
+          }));
         })
         .catch((error) => {
-          toast.error(error.response.data);
+          toast.error(error);
         });
     }
   };
