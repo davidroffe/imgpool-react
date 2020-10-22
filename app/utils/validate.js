@@ -39,6 +39,9 @@ export default {
     if (newPost.file.name === undefined || newPost.file.name === '') {
       newErrorMessage.push('Please select a file.');
     }
+    if (newPost.file.value.size > 1000000) {
+      newErrorMessage.push('File size cannot be greater than 1MB.');
+    }
     if (newPost.tags.split(' ').length < 4) {
       newErrorMessage.push(
         'Minimum 4 space-separated tags. ie: red race_car bmw m3'
