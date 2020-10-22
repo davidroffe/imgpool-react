@@ -92,12 +92,16 @@ export const UserProfile = (props) => {
       props
         .dispatch(editUser(user.id, editAccount, user.email))
         .then((res) => {
-          setUser((user) => ({
-            ...user,
-            email: res.email,
-            username: res.username,
-            bio: res.bio,
-          }));
+          setUser((user) => {
+            if (res.status === 'success') {
+              return {
+                ...user,
+                email: res.email,
+                username: res.username,
+                bio: res.bio,
+              };
+            }
+          });
         })
         .catch((error) => {
           toast.error(error);
