@@ -51,6 +51,9 @@ const Dashboard = ({
       }
     }
   }, []);
+  useEffect(() => {
+    clearValues();
+  }, [email, username, bio]);
   const logout = (e) => {
     e.preventDefault();
 
@@ -62,9 +65,9 @@ const Dashboard = ({
     setEditAccount({
       show: false,
       field: '',
-      email: '',
-      username: '',
-      bio: bio,
+      email,
+      username,
+      bio,
       password: '',
       passwordConfirm: '',
     });
