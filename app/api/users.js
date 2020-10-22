@@ -12,4 +12,11 @@ export default {
       method: 'POST',
     }).then((res) => res.json());
   },
+  toggleAccountStatus: (user) => {
+    const url = `/api/user/${user.active ? 'disable' : 'enable'}/${user.id}`;
+
+    return fetch(url, {
+      method: 'POST',
+    }).then((res) => res.json());
+  },
 };

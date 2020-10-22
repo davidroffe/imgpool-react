@@ -120,17 +120,15 @@ export const UserProfile = (props) => {
   const handleToggleAccountSubmit = (e) => {
     e.preventDefault();
 
-    const url = `/api/user/${user.active ? 'disable' : 'enable'}/${user.id}`;
-
-    fetch(url, {
-      method: 'POST',
-    })
-      .then((res) => res.json())
+    userApi
+      .toggleAccountStatus(user)
       .then((res) => {
         setUser({
           ...user,
           active: res.active,
         });
+
+        toast.success(`Account ${res.active ? 'enabled' : 'disabled'}.`);
       })
       .catch((error) => {
         toast.error(error.response.data);
