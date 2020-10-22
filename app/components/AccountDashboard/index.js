@@ -129,6 +129,7 @@ const Dashboard = ({
       .then((res) => {
         if (res.status === 'success') {
           clearValues();
+          toast.success('Post creation successful.');
         }
       })
       .catch((error) => {
