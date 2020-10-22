@@ -30,4 +30,25 @@ export default {
       method: 'POST',
     });
   },
+  createPost: (newPost) => {
+    const url = '/api/post/create';
+    const formData = new FormData();
+    const urlSearchParams = new URLSearchParams({
+      source: newPost.source,
+      tags: newPost.tags,
+    });
+    formData.append('image', newPost.file.value);
+    return fetch(`${url}?${urlSearchParams}`, {
+      method: 'POST',
+      body: formData,
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        try {
+          return JSON.parse(res);
+        } catch (error) {
+          throw res;
+        }
+      });
+  },
 };

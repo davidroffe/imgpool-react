@@ -3,6 +3,7 @@ import postApi from '../api/posts';
 import { getTagsFromPosts } from '../utils/tags';
 import userApi from '../api/users';
 import flagApi from '../api/flags';
+import validate from '../utils/validate';
 
 const postsPerPage = process.env.POSTS_PER_PAGE;
 
@@ -72,6 +73,20 @@ export function getPosts(
     });
   };
 }
+
+export const createNewPost = (newPost) => (dispatch) => {
+  const newErrorMessage = validate.createPostForm(newPost);
+
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    return postApi.createPost(newPost).then((res) => {
+      dispatch(setPosts({ list: [], page: 1, totalCount: 0 }));
+
+      return res;
+    });
+  }
+};
 
 export const signUp = (email, username, password, passwordConfirm) => (
   dispatch

@@ -33,4 +33,18 @@ export default {
 
     return newErrorMessage;
   },
+  createPostForm: (newPost) => {
+    let newErrorMessage = [];
+
+    if (newPost.file.name === undefined || newPost.file.name === '') {
+      newErrorMessage.push('Please select a file.');
+    }
+    if (newPost.tags.split(' ').length < 4) {
+      newErrorMessage.push(
+        'Minimum 4 space-separated tags. ie: red race_car bmw m3'
+      );
+    }
+
+    return newErrorMessage;
+  },
 };

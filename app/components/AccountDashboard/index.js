@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { setPosts, editUser } from '../../actions';
+import { editUser, createNewPost } from '../../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import CreatePost from './CreatePost';
@@ -121,47 +121,21 @@ const Dashboard = ({
   const handleCreatePostSubmit = (e) => {
     e.preventDefault();
 
-    const url = '/api/post/create';
-    let formData = new FormData();
-    const headers = {
-      'content-type': 'multipart/form-data',
-    };
-    let newErrorMessage = [];
-
-    if (createPost.file.name === undefined || createPost.file.name === '') {
-      newErrorMessage.push('Please select a file.');
-    }
-    if (createPost.tags.split(' ').length < 4) {
-      newErrorMessage.push(
-        'Minimum 4 space separated tags. ie: red race_car bmw m3'
-      );
-    }
-    if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach((error) => {
-        toast.error(error);
-      });
-    } else {
-      const urlSearchParams = new URLSearchParams({
-        source: createPost.source,
-        tags: createPost.tags,
-      });
-      formData.append('image', createPost.file.value);
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'POST',
-        headers,
-        body: formData,
+    dispatch(createNewPost(createPost))
+      .then((res) => {
+        if (res.status === 'success') {
+          clearValues();
+        }
       })
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.status === 'success') {
-            clearValues();
-            dispatch(setPosts({ list: [], page: 1, totalCount: 0 }));
-          }
-        })
-        .catch((error) => {
+      .catch((error) => {
+        if (Array.isArray(error)) {
+          error.forEach((errorItem) => {
+            toast.error(errorItem);
+          });
+        } else {
           toast.error(error);
-        });
-    }
+        }
+      });
   };
   return (
     <section className="container dashboard" id="account-dashboard">
