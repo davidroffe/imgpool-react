@@ -50,13 +50,16 @@ export const UserProfile = (props) => {
       })
       .catch(() => props.history.push('/404'));
   }, []);
+  useEffect(() => {
+    clearValues();
+  }, [user]);
   const clearValues = () => {
     setEditAccount({
       show: false,
       field: '',
-      email: '',
-      username: '',
-      bio: '',
+      email: user.email,
+      username: user.username,
+      bio: user.bio,
       password: '',
       passwordConfirm: '',
     });
