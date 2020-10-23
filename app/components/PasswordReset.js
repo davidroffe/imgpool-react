@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { setUser } from '../actions';
+import { resetPassword } from '../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -10,38 +10,27 @@ export const PasswordReset = (props) => {
   const handlePasswordResetSubmit = (e) => {
     e.preventDefault();
 
-    let newErrorMessage = [];
-    const url = '/api/user/password-reset';
-
-    if (password !== passwordConfirm) {
-      newErrorMessage.push('Passwords do not match.');
-    }
-    if (password.length < 8) {
-      newErrorMessage.push('Password must be at least 8 characters.');
-    }
-    if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach((error) => {
-        toast.error(error);
-      });
-    } else {
-      const urlSearchParams = new URLSearchParams({
-        passwordResetToken: props.match.params.passwordResetToken,
-        password: password,
-      });
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'POST',
+    props
+      .dispatch(
+        resetPassword(
+          null,
+          password,
+          passwordConfirm,
+          props.match.params.passwordResetToken
+        )
+      )
+      .then(() => {
+        props.history.push('/account');
       })
-        .then((res) => res.json())
-        .then((res) => {
-          props.dispatch(setUser('email', res.email));
-          props.dispatch(setUser('username', res.username));
-          props.dispatch(setUser('loggedIn', true));
-          props.history.push('/account');
-        })
-        .catch((error) => {
+      .catch((error) => {
+        if (Array.isArray(error)) {
+          error.forEach((errorItem) => {
+            toast.error(errorItem);
+          });
+        } else {
           toast.error(error);
-        });
-    }
+        }
+      });
   };
   return (
     <div id="account-center">

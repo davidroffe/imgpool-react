@@ -19,13 +19,20 @@ export default {
       method: 'POST',
     }).then((res) => res.json());
   },
-  resetPassword: (id) => {
-    const url = `/api/user/password-reset/${id}`;
-
-    return fetch(url, {
+  resetPassword: (id, password, passwordResetToken) => {
+    const url = `/api/user/password-reset/${id || ''}`;
+    const urlSearchParams = new URLSearchParams({
+      passwordResetToken,
+      password,
+    });
+    return fetch(id ? url : `${url}?${urlSearchParams}`, {
       method: 'POST',
     }).then((res) => {
-      if (res.status !== 200) throw res.statusText;
+      if (res.status !== 200) {
+        throw res.statusText;
+      } else {
+        return res.json();
+      }
     });
   },
 };

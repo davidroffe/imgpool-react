@@ -172,7 +172,7 @@ export const login = (email, password) => (dispatch) => {
   }
 };
 
-export const resetPassword = (email) => () => {
+export const forgotPassword = (email) => () => {
   const newErrorMessage = [];
   const url = '/api/user/password-reset';
 
@@ -188,6 +188,34 @@ export const resetPassword = (email) => () => {
     return fetch(`${url}?${urlSeachParams}`, {
       method: 'POST',
     });
+  }
+};
+
+export const resetPassword = (
+  id,
+  password = null,
+  passwordConfirm = null,
+  passwordResetToken = null
+) => (dispatch) => {
+  const editAccount = {
+    field: 'edit-password',
+    password,
+    passwordConfirm,
+  };
+  const newErrorMessage = validate.editForm(editAccount, null, null);
+
+  if (!id && newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    return userApi
+      .resetPassword(id, password, passwordResetToken)
+      .then((res) => {
+        if (!id) {
+          dispatch(setUser('email', res.email));
+          dispatch(setUser('username', res.username));
+          dispatch(setUser('loggedIn', true));
+        }
+      });
   }
 };
 

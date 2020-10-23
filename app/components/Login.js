@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { login, signUp, resetPassword } from '../actions';
+import { login, signUp, forgotPassword } from '../actions';
 import { ToastContainer, toast } from 'react-toastify';
 
 const mapStateToProps = (state) => {
@@ -67,7 +67,7 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
         });
         break;
       case 'forgotPassword':
-        processing = dispatch(resetPassword(email))
+        processing = dispatch(forgotPassword(email))
           .then((res) => res.json())
           .then(() => {
             toast.success('An email has been sent.');
