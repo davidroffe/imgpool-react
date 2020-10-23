@@ -107,7 +107,7 @@ export const UserProfile = (props) => {
     userApi
       .resetPassword(user.id)
       .then(() => {
-        toast.success('Password reset successful.');
+        toast.success('An email has been sent to the user.');
       })
       .catch((res) => {
         toast.error(res);
