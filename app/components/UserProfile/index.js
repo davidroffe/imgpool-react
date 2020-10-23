@@ -104,11 +104,14 @@ export const UserProfile = (props) => {
   };
 
   const resetPassword = () => {
-    const url = `/api/user/password-reset/${user.id}`;
-
-    fetch(url, {
-      method: 'POST',
-    }).then(() => {});
+    userApi
+      .resetPassword(user.id)
+      .then(() => {
+        toast.success('Password reset successful.');
+      })
+      .catch((res) => {
+        toast.error(res);
+      });
   };
 
   const handleToggleAccountSubmit = (e) => {

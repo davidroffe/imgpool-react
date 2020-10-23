@@ -19,4 +19,13 @@ export default {
       method: 'POST',
     }).then((res) => res.json());
   },
+  resetPassword: (id) => {
+    const url = `/api/user/password-reset/${id}`;
+
+    return fetch(url, {
+      method: 'POST',
+    }).then((res) => {
+      if (res.status !== 200) throw res.statusText;
+    });
+  },
 };
