@@ -6,7 +6,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import CreatePost from './CreatePost';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
-import validate from '../../utils/validate';
 
 const mapStateToProps = (state) => {
   return {
@@ -102,24 +101,22 @@ const Dashboard = ({
   const handleEditSubmit = (e) => {
     e.preventDefault();
 
-    const newErrorMessage = validate.editForm(editAccount, email, username);
-
-    if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach((error) => {
-        toast.error(error);
-      });
-    } else {
-      dispatch(editUser(null, editAccount, email))
-        .then((res) => {
-          if (res.status === 'success') {
-            clearValues();
-            toast.success('Edit successful.');
-          }
-        })
-        .catch((error) => {
+    dispatch(editUser(null, editAccount, email, username))
+      .then((res) => {
+        if (res.status === 'success') {
+          clearValues();
+          toast.success('Edit successful.');
+        }
+      })
+      .catch((error) => {
+        if (Array.isArray(error)) {
+          error.forEach((errorItem) => {
+            toast.error(errorItem);
+          });
+        } else {
           toast.error(error);
-        });
-    }
+        }
+      });
   };
 
   const handleCreatePostSubmit = (e) => {

@@ -191,7 +191,7 @@ export const resetPassword = (email) => () => {
   }
 };
 
-export const editUser = (id, editAccount, email) => (dispatch) => {
+export const editUser = (id, editAccount, email, username) => (dispatch) => {
   const url = '/api/user/edit/' + (id || '');
   const urlSearchParams = new URLSearchParams({
     currentEmail: email,
@@ -203,18 +203,24 @@ export const editUser = (id, editAccount, email) => (dispatch) => {
     passwordConfirm: editAccount.passwordConfirm,
   });
 
-  return fetch(`${url}?${urlSearchParams}`, {
-    method: 'post',
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.status === 'success') {
-        dispatch(setUser('email', res.email));
-        dispatch(setUser('username', res.username));
-        dispatch(setUser('bio', res.bio));
-      }
-      return res;
-    });
+  const newErrorMessage = validate.editForm(editAccount, email, username);
+
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    return fetch(`${url}?${urlSearchParams}`, {
+      method: 'post',
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 'success' && id !== null) {
+          dispatch(setUser('email', res.email));
+          dispatch(setUser('username', res.username));
+          dispatch(setUser('bio', res.bio));
+        }
+        return res;
+      });
+  }
 };
 
 export const setPostsLoading = (state) => {

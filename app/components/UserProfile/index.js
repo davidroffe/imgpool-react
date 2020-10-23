@@ -6,7 +6,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
 import userApi from '../../api/users';
-import validate from '../../utils/validate';
 
 const mapStateToProps = (state) => {
   return {
@@ -78,36 +77,30 @@ export const UserProfile = (props) => {
   const handleEditSubmit = (e) => {
     e.preventDefault();
 
-    const newErrorMessage = validate.editForm(
-      editAccount,
-      user.email,
-      user.username
-    );
-
-    if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach((error) => {
-        toast.error(error);
-      });
-    } else {
-      props
-        .dispatch(editUser(user.id, editAccount, user.email))
-        .then((res) => {
-          setUser((user) => {
-            if (res.status === 'success') {
-              toast.success('Edit successful.');
-              return {
-                ...user,
-                email: res.email,
-                username: res.username,
-                bio: res.bio,
-              };
-            }
-          });
-        })
-        .catch((error) => {
-          toast.error(error);
+    props
+      .dispatch(editUser(user.id, editAccount, user.email, user.username))
+      .then((res) => {
+        setUser((user) => {
+          if (res.status === 'success') {
+            toast.success('Edit successful.');
+            return {
+              ...user,
+              email: res.email,
+              username: res.username,
+              bio: res.bio,
+            };
+          }
         });
-    }
+      })
+      .catch((error) => {
+        if (Array.isArray(error)) {
+          error.forEach((errorItem) => {
+            toast.error(errorItem);
+          });
+        } else {
+          toast.error(error);
+        }
+      });
   };
 
   const resetPassword = () => {
