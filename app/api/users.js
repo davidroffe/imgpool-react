@@ -35,4 +35,7 @@ export default {
       }
     });
   },
+  logout: () => {
+    return fetch('/api/user/logout', { method: 'POST' });
+  },
 };

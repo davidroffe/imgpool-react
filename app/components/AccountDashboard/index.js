@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import CreatePost from './CreatePost';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
+import userApi from '../../api/users';
 
 const mapStateToProps = (state) => {
   return {
@@ -56,7 +57,7 @@ const Dashboard = ({
   const logout = (e) => {
     e.preventDefault();
 
-    fetch('/api/user/logout', { method: 'POST' }).then(() => {
+    userApi.logout().then(() => {
       window.location.reload();
     });
   };
