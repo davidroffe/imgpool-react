@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
-import { setFlags, setPosts, setTags } from '../actions';
+import { setFlags, deletePost } from '../actions';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -263,15 +263,11 @@ const FlagList = (props) => {
     e.preventDefault();
     const selectedFlag = props.flags[selected];
 
-    fetch(`/api/post/delete/${selectedFlag.postId}`, {
-      method: 'POST',
-    })
+    props
+      .dispatch(deletePost(selectedFlag.postId))
       .then(() => {
         toast.success('Post deleted.');
-        props.dispatch(setPosts({ list: [], page: 0, totalCount: 0 }));
-        props.dispatch(setTags([]));
-        setSelected([]);
-        retrieveFlags();
+        history.push('/posts');
       })
       .catch((error) => {
         toast.error(error);
