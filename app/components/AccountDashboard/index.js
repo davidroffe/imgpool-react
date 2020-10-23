@@ -50,7 +50,7 @@ const Dashboard = ({
         clearValues();
       }
     }
-  }, []);
+  }, [userInit]);
   useEffect(() => {
     clearValues();
   }, [email, username, bio]);
