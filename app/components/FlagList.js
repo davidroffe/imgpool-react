@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
-import { setFlags, deletePost } from '../actions';
+import { getFlags, deletePost } from '../actions';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -228,35 +228,7 @@ const FlagList = (props) => {
   }, []);
 
   const retrieveFlags = () => {
-    fetch('/api/post/flag/list', { method: 'GET' }).then((res) => {
-      if (res.data.length) {
-        props.dispatch(
-          setFlags(
-            res.data.map((flag) => {
-              return {
-                ...flag,
-                date: new Date(flag.createdAt).toLocaleDateString(),
-                active: flag.post.active,
-                user: { id: flag.userId, username: flag.user.username },
-              };
-            })
-          )
-        );
-      } else {
-        props.dispatch(
-          setFlags([
-            {
-              id: 0,
-              postId: 0,
-              date: '',
-              user: { id: 0, username: '' },
-              active: true,
-              reason: '',
-            },
-          ])
-        );
-      }
-    });
+    props.dispatch(getFlags());
   };
 
   const handlePostDelete = (e) => {

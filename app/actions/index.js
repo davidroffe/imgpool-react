@@ -251,6 +251,43 @@ export const editUser = (id, editAccount, email, username) => (dispatch) => {
   }
 };
 
+export const getFlags = () => (dispatch) => {
+  flagApi.getFlags().then((res) => {
+    if (res.data.length) {
+      dispatch(
+        setFlags(
+          res.data.map((flag) => {
+            return {
+              ...flag,
+              date: new Date(flag.createdAt).toLocaleDateString(),
+              active: flag.post.active,
+              user: { id: flag.userId, username: flag.user.username },
+            };
+          })
+        )
+      );
+    } else {
+      dispatch(
+        setFlags([
+          {
+            id: 0,
+            postId: 0,
+            date: '',
+            user: { id: 0, username: '' },
+            active: true,
+            reason: '',
+          },
+        ])
+      );
+    }
+  });
+};
+
+export const setFlags = (flags) => ({
+  type: 'SET_FLAGS',
+  flags,
+});
+
 export const setPostsLoading = (state) => {
   return {
     type: 'SET_POSTS_LOADING',
@@ -281,11 +318,6 @@ export const setTags = (tags) => ({
 export const setUsers = (users) => ({
   type: 'SET_USERS',
   users,
-});
-
-export const setFlags = (flags) => ({
-  type: 'SET_FLAGS',
-  flags,
 });
 
 export const createPostFlag = (postId, reason) => () => {
