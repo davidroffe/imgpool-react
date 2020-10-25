@@ -172,6 +172,25 @@ export const login = (email, password) => (dispatch) => {
   }
 };
 
+export const getCurrentUser = () => (dispatch) => {
+  fetch('/api/user/get/current', { method: 'POST' })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res.valid) {
+        dispatch(setUser('id', res.id));
+        dispatch(setUser('username', res.username));
+        dispatch(setUser('email', res.email));
+        dispatch(setUser('bio', res.bio));
+        dispatch(setUser('loggedIn', true));
+        dispatch(setUser('admin', res.admin));
+        dispatch(setUser('favorites', res.favorites));
+        dispatch(setUser('init', true));
+      } else {
+        dispatch(clearUser());
+      }
+    });
+};
+
 export const forgotPassword = (email) => () => {
   const newErrorMessage = [];
   const url = '/api/user/password-reset';
