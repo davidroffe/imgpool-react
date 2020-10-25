@@ -77,11 +77,8 @@ const Dashboard = ({ dispatch, userInit, loggedIn, admin, flags }) => {
 
   const handleTagSubmit = (url, tagIds) => {
     if (tagIds.length) {
-      const urlSearchParams = new URLSearchParams({ tagIds });
-
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'post',
-      })
+      tagsApi
+        .toggleTagState(url, tagIds)
         .then(() => {
           retrieveTags();
           setShowTagForm(!showTagForm);
