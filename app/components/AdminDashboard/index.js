@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { setUsers, setFlags } from '../../actions';
 import { ToastContainer, toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import TagForm from './TagForm';
 import UserSelectForm from './UserSelectForm';
 import Loader from '../Utility/Loader';
+import settingsApi from '../../api/setting';
 import tagsApi from '../../api/tags';
+import userApi from '../../api/users';
+import flagApi from '../../api/flags';
 
 const mapStateToProps = (state) => {
   return {
     loggedIn: state.user.loggedIn,
     admin: state.user.admin,
-    users: state.users,
-    flags: state.flags,
     userInit: state.user.init,
   };
 };
@@ -23,56 +23,45 @@ const Dashboard = (props) => {
   const [showUserForm, setShowUserForm] = useState(false);
   const [showTagForm, setShowTagForm] = useState(false);
   const [canSignUp, setCanSignUp] = useState(true);
+  const [users, setUsers] = useState([]);
   const [tags, setTags] = useState([]);
-
-  useEffect(() => {
-    retrieveSignUpStatus();
-  }, []);
+  const [flags, setFlags] = useState([]);
 
   useEffect(() => {
     if (props.userInit) {
       if (!props.loggedIn || !props.admin) {
         props.history.push('/account');
       } else {
+        retrieveSignUpStatus();
         retrieveTags();
-        if (!props.users.length) {
-          retrieveUsers();
-        }
-        if (!props.flags.length) {
-          retrieveflags();
-        }
+        retrieveUsers();
+        retrieveflags();
       }
     }
-  });
+  }, []);
 
   const retrieveTags = () => {
     tagsApi.fetchTags().then((res) => {
-      props.dispatch(setTags(res.length ? res : [false]));
+      setTags(res.length ? res : [false]);
     });
   };
 
   const retrieveUsers = () => {
-    fetch('/api/user/get', { method: 'GET' })
-      .then((res) => res.json())
-      .then((res) => {
-        props.dispatch(setUsers(res.length ? res : [false]));
-      });
+    userApi.getUsers().then((res) => {
+      setUsers(res.length ? res : [false]);
+    });
   };
 
   const retrieveflags = () => {
-    fetch('/api/post/flag/get/', { method: 'GET' })
-      .then((res) => res.json())
-      .then((res) => {
-        props.dispatch(setFlags(res.length ? res : [false]));
-      });
+    flagApi.getFlags().then((res) => {
+      setFlags(res.length ? res : [false]);
+    });
   };
 
   const retrieveSignUpStatus = () => {
-    fetch('/api/setting/signup/', { method: 'GET' })
-      .then((res) => res.json())
-      .then((res) => {
-        setCanSignUp(res.signUp);
-      });
+    settingsApi.signup().then((res) => {
+      setCanSignUp(res.signUp);
+    });
   };
 
   const toggleSignup = (e) => {
@@ -123,8 +112,8 @@ const Dashboard = (props) => {
           <div className="left">
             <h2>Flags</h2>
             <div className="row">
-              <p>({props.flags[0] ? props.flags.length : '0'})</p>
-              {props.flags[0] ? (
+              <p>({flags[0] ? flags.length : '0'})</p>
+              {flags[0] ? (
                 <Link to="/flags" id="show-flags">
                   manage
                 </Link>
@@ -132,8 +121,8 @@ const Dashboard = (props) => {
             </div>
             <h2>Users</h2>
             <div className="row">
-              <p>({props.users[0] ? props.users.length : '0'})</p>
-              {props.users[0] ? (
+              <p>({users[0] ? users.length : '0'})</p>
+              {users[0] ? (
                 <button
                   id="show-users"
                   onClick={() => {
@@ -178,7 +167,7 @@ const Dashboard = (props) => {
             show={showUserForm}
             toggleShow={setShowUserForm}
             history={props.history}
-            users={props.users}
+            users={users}
           />
         </div>
       ) : null}
@@ -193,9 +182,6 @@ Dashboard.propTypes = {
   userInit: PropTypes.bool.isRequired,
   admin: PropTypes.bool.isRequired,
   history: PropTypes.object.isRequired,
-  tags: PropTypes.array.isRequired,
-  users: PropTypes.array.isRequired,
-  flags: PropTypes.array.isRequired,
 };
 
 export default connect(mapStateToProps)(Dashboard);
