@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { setTags, setUsers, setFlags } from '../../actions';
+import { setUsers, setFlags } from '../../actions';
 import { ToastContainer, toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import TagForm from './TagForm';
@@ -13,7 +13,6 @@ const mapStateToProps = (state) => {
   return {
     loggedIn: state.user.loggedIn,
     admin: state.user.admin,
-    tags: state.tags,
     users: state.users,
     flags: state.flags,
     userInit: state.user.init,
@@ -24,6 +23,7 @@ const Dashboard = (props) => {
   const [showUserForm, setShowUserForm] = useState(false);
   const [showTagForm, setShowTagForm] = useState(false);
   const [canSignUp, setCanSignUp] = useState(true);
+  const [tags, setTags] = useState([]);
 
   useEffect(() => {
     retrieveSignUpStatus();
@@ -34,9 +34,7 @@ const Dashboard = (props) => {
       if (!props.loggedIn || !props.admin) {
         props.history.push('/account');
       } else {
-        if (!props.tags.length) {
-          retrieveTags();
-        }
+        retrieveTags();
         if (!props.users.length) {
           retrieveUsers();
         }
@@ -148,8 +146,8 @@ const Dashboard = (props) => {
             </div>
             <h2>Tags</h2>
             <div className="row">
-              <p>({props.tags[0] ? props.tags.length : '0'})</p>
-              {props.tags[0] ? (
+              <p>({tags[0] ? tags.length : '0'})</p>
+              {tags[0] ? (
                 <button
                   id="show-tags"
                   onClick={() => {
@@ -174,7 +172,7 @@ const Dashboard = (props) => {
             show={showTagForm}
             toggleShow={setShowTagForm}
             handleSubmit={handleTagSubmit}
-            tags={props.tags}
+            tags={tags}
           />
           <UserSelectForm
             show={showUserForm}
