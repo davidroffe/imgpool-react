@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import TagForm from './TagForm';
 import UserSelectForm from './UserSelectForm';
 import Loader from '../Utility/Loader';
+import tagsApi from '../../api/tags';
 
 const mapStateToProps = (state) => {
   return {
@@ -47,11 +48,9 @@ const Dashboard = (props) => {
   });
 
   const retrieveTags = () => {
-    fetch('/api/tag/get', { method: 'GET' })
-      .then((res) => res.json())
-      .then((res) => {
-        props.dispatch(setTags(res.length ? res : [false]));
-      });
+    tagsApi.fetchTags().then((res) => {
+      props.dispatch(setTags(res.length ? res : [false]));
+    });
   };
 
   const retrieveUsers = () => {
