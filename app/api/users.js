@@ -4,6 +4,9 @@ export default {
 
     return fetch(url, { method: 'GET' }).then((res) => res.json());
   },
+  getUsers: () => {
+    return fetch('/api/user/get', { method: 'GET' }).then((res) => res.json());
+  },
   setFavorite: (id) => {
     const url = '/api/post/favorite';
     const urlSearchParams = new URLSearchParams({ postId: id });
