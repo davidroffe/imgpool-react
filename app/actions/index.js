@@ -253,10 +253,10 @@ export const editUser = (id, editAccount, email, username) => (dispatch) => {
 
 export const getFlags = () => (dispatch) => {
   flagApi.getFlags().then((res) => {
-    if (res.data.length) {
+    if (res.length) {
       dispatch(
         setFlags(
-          res.data.map((flag) => {
+          res.map((flag) => {
             return {
               ...flag,
               date: new Date(flag.createdAt).toLocaleDateString(),
