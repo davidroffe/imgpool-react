@@ -4,4 +4,11 @@ export default {
       res.json()
     );
   },
+  toggleSignup: () => {
+    const url = '/api/setting/signup/toggle';
+
+    return fetch(url, {
+      method: 'post',
+    }).then((res) => res.json());
+  },
 };

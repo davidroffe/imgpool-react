@@ -65,14 +65,9 @@ const Dashboard = ({ dispatch, userInit, loggedIn, admin, flags }) => {
   const toggleSignup = (e) => {
     e.preventDefault();
 
-    const url = '/api/setting/signup/toggle';
-
-    fetch(url, {
-      method: 'post',
-    })
-      .then((res) => res.json())
+    settingsApi
+      .toggleSignup()
       .then((res) => {
-        retrieveTags();
         setCanSignUp(res.signUp);
       })
       .catch((error) => {
