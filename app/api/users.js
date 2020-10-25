@@ -1,4 +1,9 @@
 export default {
+  getCurrent: () => {
+    return fetch('/api/user/get/current', { method: 'POST' }).then((res) =>
+      res.json()
+    );
+  },
   getUser: (id) => {
     const url = `/api/user/get/${id}`;
 
