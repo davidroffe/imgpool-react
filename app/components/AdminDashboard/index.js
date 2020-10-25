@@ -19,7 +19,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const Dashboard = (props) => {
+const Dashboard = ({ userInit, loggedIn, admin }) => {
   const [showUserForm, setShowUserForm] = useState(false);
   const [showTagForm, setShowTagForm] = useState(false);
   const [canSignUp, setCanSignUp] = useState(true);
@@ -28,9 +28,9 @@ const Dashboard = (props) => {
   const [flags, setFlags] = useState([]);
 
   useEffect(() => {
-    if (props.userInit) {
-      if (!props.loggedIn || !props.admin) {
-        props.history.push('/account');
+    if (userInit) {
+      if (!loggedIn || !admin) {
+        history.push('/account');
       } else {
         retrieveSignUpStatus();
         retrieveTags();
@@ -104,7 +104,7 @@ const Dashboard = (props) => {
   return (
     <section className="container dashboard" id="account-dashboard">
       <ToastContainer />
-      {props.userInit && props.loggedIn ? (
+      {userInit && loggedIn ? (
         <div className="inner">
           <h1>
             <span>Admin</span>
@@ -166,12 +166,12 @@ const Dashboard = (props) => {
           <UserSelectForm
             show={showUserForm}
             toggleShow={setShowUserForm}
-            history={props.history}
+            history={history}
             users={users}
           />
         </div>
       ) : null}
-      <Loader show={!props.userInit} />
+      <Loader show={!userInit} />
     </section>
   );
 };
