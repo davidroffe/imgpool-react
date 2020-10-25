@@ -3,14 +3,13 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
 import PropTypes from 'prop-types';
-import { setFlags } from '../../actions';
+import { getFlags } from '../../actions';
 import TagForm from './TagForm';
 import UserSelectForm from './UserSelectForm';
 import Loader from '../Utility/Loader';
 import settingsApi from '../../api/setting';
 import tagsApi from '../../api/tags';
 import userApi from '../../api/users';
-import flagApi from '../../api/flags';
 
 const mapStateToProps = (state) => {
   return {
@@ -34,9 +33,9 @@ const Dashboard = ({ dispatch, userInit, loggedIn, admin, flags }) => {
         history.push('/account');
       } else {
         retrieveSignUpStatus();
-        retrieveTags();
-        retrieveUsers();
-        retrieveflags();
+        if (tags.length === 0) retrieveTags();
+        if (users.length === 0) retrieveUsers();
+        if (flags.length === 0) retrieveflags();
       }
     }
   }, []);
@@ -54,9 +53,7 @@ const Dashboard = ({ dispatch, userInit, loggedIn, admin, flags }) => {
   };
 
   const retrieveflags = () => {
-    flagApi.getFlags().then((res) => {
-      dispatch(setFlags(res.length ? res : [false]));
-    });
+    dispatch(getFlags());
   };
 
   const retrieveSignUpStatus = () => {
