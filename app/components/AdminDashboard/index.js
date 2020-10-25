@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
 import PropTypes from 'prop-types';
+import { setFlags } from '../../actions';
 import TagForm from './TagForm';
 import UserSelectForm from './UserSelectForm';
 import Loader from '../Utility/Loader';
@@ -16,16 +17,16 @@ const mapStateToProps = (state) => {
     loggedIn: state.user.loggedIn,
     admin: state.user.admin,
     userInit: state.user.init,
+    flags: state.flags,
   };
 };
 
-const Dashboard = ({ userInit, loggedIn, admin }) => {
+const Dashboard = ({ dispatch, userInit, loggedIn, admin, flags }) => {
   const [showUserForm, setShowUserForm] = useState(false);
   const [showTagForm, setShowTagForm] = useState(false);
   const [canSignUp, setCanSignUp] = useState(true);
   const [users, setUsers] = useState([]);
   const [tags, setTags] = useState([]);
-  const [flags, setFlags] = useState([]);
 
   useEffect(() => {
     if (userInit) {
@@ -54,7 +55,7 @@ const Dashboard = ({ userInit, loggedIn, admin }) => {
 
   const retrieveflags = () => {
     flagApi.getFlags().then((res) => {
-      setFlags(res.length ? res : [false]);
+      dispatch(setFlags(res.length ? res : [false]));
     });
   };
 
@@ -182,6 +183,7 @@ Dashboard.propTypes = {
   userInit: PropTypes.bool.isRequired,
   admin: PropTypes.bool.isRequired,
   history: PropTypes.object.isRequired,
+  flags: PropTypes.array.isRequired,
 };
 
 export default connect(mapStateToProps)(Dashboard);
