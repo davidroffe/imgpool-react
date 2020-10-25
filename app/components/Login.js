@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { login, signUp, forgotPassword } from '../actions';
+import settingsApi from '../api/setting';
 import { ToastContainer, toast } from 'react-toastify';
 
 const mapStateToProps = (state) => {
@@ -24,13 +25,11 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
   const [canSignUp, setCanSignUp] = useState(true);
 
   useEffect(() => {
-    fetch('/api/setting/signup', { method: 'GET' })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res) {
-          setCanSignUp(res.signUp);
-        }
-      });
+    settingsApi.signup().then((res) => {
+      if (res) {
+        setCanSignUp(res.signUp);
+      }
+    });
   }, []);
 
   useEffect(() => {
