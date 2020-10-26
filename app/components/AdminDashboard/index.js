@@ -20,7 +20,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const Dashboard = ({ dispatch, userInit, loggedIn, admin, flags }) => {
+const Dashboard = ({ history, dispatch, userInit, loggedIn, admin, flags }) => {
   const [showUserForm, setShowUserForm] = useState(false);
   const [showTagForm, setShowTagForm] = useState(false);
   const [canSignUp, setCanSignUp] = useState(true);
@@ -91,6 +91,10 @@ const Dashboard = ({ dispatch, userInit, loggedIn, admin, flags }) => {
     }
   };
 
+  const handleSelectUser = (id) => {
+    history.push(`/user/${id}`);
+  };
+
   return (
     <section className="container dashboard" id="account-dashboard">
       <ToastContainer />
@@ -156,7 +160,7 @@ const Dashboard = ({ dispatch, userInit, loggedIn, admin, flags }) => {
           <UserSelectForm
             show={showUserForm}
             toggleShow={setShowUserForm}
-            history={history}
+            handleSelectUser={handleSelectUser}
             users={users}
           />
         </div>

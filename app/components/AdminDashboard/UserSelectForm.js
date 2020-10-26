@@ -3,10 +3,10 @@ import Select from 'react-select';
 import PropTypes from 'prop-types';
 import Modal from '../Utility/Modal';
 
-const UserSelectForm = props => {
-  const handleChange = selectedUser => {
+const UserSelectForm = (props) => {
+  const handleChange = (selectedUser) => {
     if (selectedUser.hasOwnProperty('id'))
-      props.history.push(`/user/${selectedUser.id}`);
+      props.handleSelectUser(selectedUser.id);
   };
 
   return (
@@ -14,11 +14,11 @@ const UserSelectForm = props => {
       <form id="admin-manage-form" className="form-light">
         <Select
           classNamePrefix="admin-manage-select"
-          options={props.users.map(user => {
+          options={props.users.map((user) => {
             return {
               value: user.username,
               label: `${user.username} ${user.active ? '' : '(Disabled)'}`,
-              id: user.id
+              id: user.id,
             };
           })}
           onChange={handleChange}
@@ -29,10 +29,10 @@ const UserSelectForm = props => {
 };
 
 UserSelectForm.propTypes = {
-  history: PropTypes.object.isRequired,
+  handleSelectUser: PropTypes.func.isRequired,
   users: PropTypes.array.isRequired,
   show: PropTypes.bool.isRequired,
-  toggleShow: PropTypes.func.isRequired
+  toggleShow: PropTypes.func.isRequired,
 };
 
 export default UserSelectForm;
