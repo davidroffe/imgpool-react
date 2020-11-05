@@ -66,11 +66,9 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
         });
         break;
       case 'forgotPassword':
-        processing = dispatch(forgotPassword(email))
-          .then((res) => res.json())
-          .then(() => {
-            toast.success('An email has been sent.');
-          });
+        processing = dispatch(forgotPassword(email)).then((message) => {
+          toast.success(message);
+        });
         break;
     }
 
