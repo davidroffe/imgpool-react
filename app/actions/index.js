@@ -49,7 +49,7 @@ export function getPosts(
     newPage: undefined,
   }
 ) {
-  return function(dispatch, getState) {
+  return async function(dispatch, getState) {
     const page = isNaN(newPage) ? 1 : newPage;
     const searchQuery =
       typeof newSearchQuery === 'string' ? newSearchQuery : getState().search;
@@ -57,20 +57,21 @@ export function getPosts(
     dispatch(setPage(page));
     dispatch(setPostsLoading(true));
 
-    return fetchPosts(searchQuery, page, postsPerPage).then((res) => {
-      const newPosts = res.list.length
-        ? {
-            list: res.list,
-            page,
-            totalCount: res.totalCount,
-            loading: false,
-          }
-        : { list: [false], page: 1, totalCount: 0, loading: false };
+    const res = await fetchPosts(searchQuery, page, postsPerPage);
+    const newPosts = res.list.length
+      ? {
+          list: res.list,
+          page,
+          totalCount: res.totalCount,
+          loading: false,
+        }
+      : { list: [false], page: 1, totalCount: 0, loading: false };
 
-      dispatch(setSearch(searchQuery));
-      dispatch(setPosts(newPosts));
-      dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
-    });
+    dispatch(setSearch(searchQuery));
+    dispatch(setPosts(newPosts));
+    dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
+
+    return res;
   };
 }
 
