@@ -27,6 +27,21 @@ export default {
       method: 'POST',
     }).then((res) => res.json());
   },
+  forgotPassword: (email) => {
+    const url = '/api/user/password-reset';
+    const urlSeachParams = new URLSearchParams({
+      email: email,
+    });
+    return fetch(`${url}?${urlSeachParams}`, {
+      method: 'POST',
+    }).then((res) => {
+      if (res.status === 500) {
+        throw 'Server error.';
+      } else {
+        return 'An email has been sent.';
+      }
+    });
+  },
   resetPassword: (id, password, passwordResetToken) => {
     const url = `/api/user/password-reset/${id || ''}`;
     const urlSearchParams = new URLSearchParams({
