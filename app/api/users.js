@@ -43,6 +43,29 @@ export default {
       }
     });
   },
+  signup: (email, username, password, passwordConfirm) => {
+    const url = '/api/user/signup';
+    const recaptchaResponse = window.grecaptcha.getResponse();
+    const urlSeachParams = new URLSearchParams({
+      email: email,
+      username: username,
+      password: password,
+      passwordConfirm: passwordConfirm,
+      recaptchaResponse,
+    });
+
+    return fetch(`${url}?${urlSeachParams}`, {
+      method: 'POST',
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        try {
+          return (res = JSON.parse(res));
+        } catch (error) {
+          throw res;
+        }
+      });
+  },
   login: (email, password) => {
     const url = '/api/user/login';
     const urlSeachParams = new URLSearchParams({
