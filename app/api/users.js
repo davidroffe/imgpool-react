@@ -43,6 +43,25 @@ export default {
       }
     });
   },
+  login: (email, password) => {
+    const url = '/api/user/login';
+    const urlSeachParams = new URLSearchParams({
+      email,
+      password,
+    });
+
+    return fetch(`${url}?${urlSeachParams}`, {
+      method: 'POST',
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        try {
+          return (res = JSON.parse(res));
+        } catch (error) {
+          throw res;
+        }
+      });
+  },
   logout: () => {
     return fetch('/api/user/logout', { method: 'POST' });
   },
