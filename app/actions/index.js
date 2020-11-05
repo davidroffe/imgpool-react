@@ -21,26 +21,22 @@ export const clearPost = () => ({
 });
 
 export function getPost(id) {
-  return function(dispatch) {
+  return async function(dispatch) {
     dispatch(clearPost());
 
-    return fetchPost(id)
-      .then((res) => {
-        dispatch(setPost(res));
-        dispatch(setTags(getTagsFromPosts([res])));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const res = await fetchPost(id);
+
+    dispatch(setPost(res));
+    dispatch(setTags(getTagsFromPosts([res])));
   };
 }
 
-export const deletePost = (id) => (dispatch) => {
-  return postApi.deletePost(id).then((res) => {
-    dispatch(setUser('favorites', res.favorites));
-    dispatch(setPosts({ posts: [], page: 1, totalCount: 0 }));
-    dispatch(setTags([]));
-  });
+export const deletePost = (id) => async (dispatch) => {
+  const res = await postApi.deletePost(id);
+
+  dispatch(setUser('favorites', res.favorites));
+  dispatch(setPosts({ posts: [], page: 1, totalCount: 0 }));
+  dispatch(setTags([]));
 };
 
 export function getPosts(
@@ -70,30 +66,23 @@ export function getPosts(
     dispatch(setSearch(searchQuery));
     dispatch(setPosts(newPosts));
     dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
-
-    return res;
   };
 }
 
-export const createNewPost = (newPost) => (dispatch) => {
+export const createNewPost = (newPost) => async (dispatch) => {
   const newErrorMessage = validate.createPostForm(newPost);
 
   if (newErrorMessage.length > 0) {
     return new Promise((resolve, reject) => reject(newErrorMessage));
   } else {
-    return postApi.createPost(newPost).then((res) => {
-      dispatch(setPosts({ list: [], page: 1, totalCount: 0 }));
-
-      return res;
-    });
+    await postApi.createPost(newPost);
+    dispatch(setPosts({ list: [], page: 1, totalCount: 0 }));
   }
 };
 
-export const signUp = (email, username, password, passwordConfirm) => (
+export const signUp = (email, username, password, passwordConfirm) => async (
   dispatch
 ) => {
-  const recaptchaResponse = window.grecaptcha.getResponse();
-  const url = '/api/user/signup';
   const newErrorMessage = [];
 
   if (email === undefined || email === '') {
@@ -111,35 +100,22 @@ export const signUp = (email, username, password, passwordConfirm) => (
   if (newErrorMessage.length > 0) {
     return new Promise((resolve, reject) => reject(newErrorMessage));
   } else {
-    const urlSeachParams = new URLSearchParams({
-      email: email,
-      username: username,
-      password: password,
-      passwordConfirm: passwordConfirm,
-      recaptchaResponse,
-    });
-    return fetch(`${url}?${urlSeachParams}`, {
-      method: 'POST',
-    })
-      .then((res) => res.text())
-      .then((res) => {
-        try {
-          const user = JSON.parse(res);
+    const user = await userApi.signup(
+      email,
+      username,
+      password,
+      passwordConfirm
+    );
 
-          dispatch(setUser('email', user.email));
-          dispatch(setUser('username', user.username));
-          dispatch(setUser('loggedIn', true));
-          dispatch(setUser('admin', user.admin));
-        } catch (error) {
-          throw res;
-        }
-      });
+    dispatch(setUser('email', user.email));
+    dispatch(setUser('username', user.username));
+    dispatch(setUser('loggedIn', true));
+    dispatch(setUser('admin', user.admin));
   }
 };
 
-export const login = (email, password) => (dispatch) => {
+export const login = (email, password) => async (dispatch) => {
   let newErrorMessage = [];
-  const url = '/api/user/login';
 
   if (email === undefined || email === '') {
     newErrorMessage.push('Please enter an email.');
@@ -150,51 +126,34 @@ export const login = (email, password) => (dispatch) => {
   if (newErrorMessage.length > 0) {
     return new Promise((resolve, reject) => reject(newErrorMessage));
   } else {
-    const urlSeachParams = new URLSearchParams({
-      email: email,
-      password: password,
-    });
-    return fetch(`${url}?${urlSeachParams}`, {
-      method: 'POST',
-    })
-      .then((res) => res.text())
-      .then((res) => {
-        try {
-          const user = JSON.parse(res);
+    const user = await userApi.login(email, password);
 
-          dispatch(setUser('email', user.email));
-          dispatch(setUser('username', user.username));
-          dispatch(setUser('loggedIn', true));
-          dispatch(setUser('admin', user.admin));
-        } catch (error) {
-          throw res;
-        }
-      });
+    dispatch(setUser('email', user.email));
+    dispatch(setUser('username', user.username));
+    dispatch(setUser('loggedIn', true));
+    dispatch(setUser('admin', user.admin));
   }
 };
 
-export const getCurrentUser = () => (dispatch) => {
-  fetch('/api/user/get/current', { method: 'POST' })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.valid) {
-        dispatch(setUser('id', res.id));
-        dispatch(setUser('username', res.username));
-        dispatch(setUser('email', res.email));
-        dispatch(setUser('bio', res.bio));
-        dispatch(setUser('loggedIn', true));
-        dispatch(setUser('admin', res.admin));
-        dispatch(setUser('favorites', res.favorites));
-        dispatch(setUser('init', true));
-      } else {
-        dispatch(clearUser());
-      }
-    });
+export const getCurrentUser = () => async (dispatch) => {
+  let res = await userApi.getCurrent();
+
+  if (res.valid) {
+    dispatch(setUser('id', res.id));
+    dispatch(setUser('username', res.username));
+    dispatch(setUser('email', res.email));
+    dispatch(setUser('bio', res.bio));
+    dispatch(setUser('loggedIn', true));
+    dispatch(setUser('admin', res.admin));
+    dispatch(setUser('favorites', res.favorites));
+    dispatch(setUser('init', true));
+  } else {
+    dispatch(clearUser());
+  }
 };
 
-export const forgotPassword = (email) => () => {
+export const forgotPassword = (email) => async () => {
   const newErrorMessage = [];
-  const url = '/api/user/password-reset';
 
   if (email === undefined || email === '') {
     newErrorMessage.push('Please enter an email.');
@@ -202,12 +161,7 @@ export const forgotPassword = (email) => () => {
   if (newErrorMessage.length > 0) {
     return new Promise((resolve, reject) => reject(newErrorMessage));
   } else {
-    const urlSeachParams = new URLSearchParams({
-      email: email,
-    });
-    return fetch(`${url}?${urlSeachParams}`, {
-      method: 'POST',
-    });
+    return await userApi.forgotPassword(email);
   }
 };
 
