@@ -136,7 +136,7 @@ export const login = (email, password) => async (dispatch) => {
 };
 
 export const getCurrentUser = () => async (dispatch) => {
-  let res = await userApi.getCurrent();
+  const res = await userApi.getCurrent();
 
   if (res.valid) {
     dispatch(setUser('id', res.id));
@@ -170,7 +170,7 @@ export const resetPassword = (
   password = null,
   passwordConfirm = null,
   passwordResetToken = null
-) => (dispatch) => {
+) => async (dispatch) => {
   const editAccount = {
     field: 'edit-password',
     password,
@@ -181,15 +181,15 @@ export const resetPassword = (
   if (!id && newErrorMessage.length > 0) {
     return new Promise((resolve, reject) => reject(newErrorMessage));
   } else {
-    return userApi
-      .resetPassword(id, password, passwordResetToken)
-      .then((res) => {
-        if (!id) {
-          dispatch(setUser('email', res.email));
-          dispatch(setUser('username', res.username));
-          dispatch(setUser('loggedIn', true));
-        }
-      });
+    const res = await userApi.resetPassword(id, password, passwordResetToken);
+
+    if (!id) {
+      dispatch(setUser('email', res.email));
+      dispatch(setUser('username', res.username));
+      dispatch(setUser('loggedIn', true));
+    }
+
+    return res;
   }
 };
 
