@@ -252,18 +252,18 @@ const FlagList = (props) => {
     setOrderBy(property);
   };
 
-  const handleClick = (event, name) => {
+  const handleClick = (event, clickedIndex) => {
     if (!props.isAdmin) return;
-    const selectedIndex = selected.indexOf(name);
+    const selectedIndex = selected.indexOf(clickedIndex);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected.push(name);
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
+      newSelected.push(...selected, clickedIndex);
+    } else if (selectedIndex > -1) {
+      newSelected = [
+        ...selected.slice(0, selectedIndex),
+        ...selected.slice(selectedIndex + 1),
+      ];
     }
 
     setSelected(newSelected);
