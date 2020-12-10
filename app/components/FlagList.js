@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
-import { setFlags, setPosts, setTags } from '../actions';
+import { getFlags, deletePost } from '../actions';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -228,50 +228,18 @@ const FlagList = (props) => {
   }, []);
 
   const retrieveFlags = () => {
-    fetch('/api/post/flag/list', { method: 'GET' }).then((res) => {
-      if (res.data.length) {
-        props.dispatch(
-          setFlags(
-            res.data.map((flag) => {
-              return {
-                ...flag,
-                date: new Date(flag.createdAt).toLocaleDateString(),
-                active: flag.post.active,
-                user: { id: flag.userId, username: flag.user.username },
-              };
-            })
-          )
-        );
-      } else {
-        props.dispatch(
-          setFlags([
-            {
-              id: 0,
-              postId: 0,
-              date: '',
-              user: { id: 0, username: '' },
-              active: true,
-              reason: '',
-            },
-          ])
-        );
-      }
-    });
+    props.dispatch(getFlags());
   };
 
   const handlePostDelete = (e) => {
     e.preventDefault();
     const selectedFlag = props.flags[selected];
 
-    fetch(`/api/post/delete/${selectedFlag.postId}`, {
-      method: 'POST',
-    })
+    props
+      .dispatch(deletePost(selectedFlag.postId))
       .then(() => {
         toast.success('Post deleted.');
-        props.dispatch(setPosts({ list: [], page: 0, totalCount: 0 }));
-        props.dispatch(setTags([]));
-        setSelected([]);
-        retrieveFlags();
+        history.push('/posts');
       })
       .catch((error) => {
         toast.error(error);
@@ -284,18 +252,18 @@ const FlagList = (props) => {
     setOrderBy(property);
   };
 
-  const handleClick = (event, name) => {
+  const handleClick = (event, clickedIndex) => {
     if (!props.isAdmin) return;
-    const selectedIndex = selected.indexOf(name);
+    const selectedIndex = selected.indexOf(clickedIndex);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected.push(name);
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
+      newSelected.push(...selected, clickedIndex);
+    } else if (selectedIndex > -1) {
+      newSelected = [
+        ...selected.slice(0, selectedIndex),
+        ...selected.slice(selectedIndex + 1),
+      ];
     }
 
     setSelected(newSelected);

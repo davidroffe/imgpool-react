@@ -1,94 +1,73 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { setTags, setUsers, setFlags } from '../../actions';
 import { ToastContainer, toast } from 'react-toastify';
 import PropTypes from 'prop-types';
+import { getFlags } from '../../actions';
 import TagForm from './TagForm';
 import UserSelectForm from './UserSelectForm';
 import Loader from '../Utility/Loader';
+import settingsApi from '../../api/setting';
+import tagsApi from '../../api/tags';
+import userApi from '../../api/users';
 
 const mapStateToProps = (state) => {
   return {
     loggedIn: state.user.loggedIn,
     admin: state.user.admin,
-    tags: state.tags,
-    users: state.users,
-    flags: state.flags,
     userInit: state.user.init,
+    flags: state.flags,
   };
 };
 
-const Dashboard = (props) => {
+const Dashboard = ({ history, dispatch, userInit, loggedIn, admin, flags }) => {
   const [showUserForm, setShowUserForm] = useState(false);
   const [showTagForm, setShowTagForm] = useState(false);
   const [canSignUp, setCanSignUp] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [tags, setTags] = useState([]);
 
   useEffect(() => {
-    retrieveSignUpStatus();
-  }, []);
-
-  useEffect(() => {
-    if (props.userInit) {
-      if (!props.loggedIn || !props.admin) {
-        props.history.push('/account');
+    if (userInit) {
+      if (!loggedIn || !admin) {
+        history.push('/account');
       } else {
-        if (!props.tags.length) {
-          retrieveTags();
-        }
-        if (!props.users.length) {
-          retrieveUsers();
-        }
-        if (!props.flags.length) {
-          retrieveflags();
-        }
+        retrieveSignUpStatus();
+        if (tags.length === 0) retrieveTags();
+        if (users.length === 0) retrieveUsers();
+        if (flags.length === 0) retrieveflags();
       }
     }
-  });
+  }, []);
 
   const retrieveTags = () => {
-    fetch('/api/tag/get', { method: 'GET' })
-      .then((res) => res.json())
-      .then((res) => {
-        props.dispatch(setTags(res.length ? res : [false]));
-      });
+    tagsApi.fetchTags().then((res) => {
+      setTags(res.length ? res : [false]);
+    });
   };
 
   const retrieveUsers = () => {
-    fetch('/api/user/get', { method: 'GET' })
-      .then((res) => res.json())
-      .then((res) => {
-        props.dispatch(setUsers(res.length ? res : [false]));
-      });
+    userApi.getUsers().then((res) => {
+      setUsers(res.length ? res : [false]);
+    });
   };
 
   const retrieveflags = () => {
-    fetch('/api/post/flag/get/', { method: 'GET' })
-      .then((res) => res.json())
-      .then((res) => {
-        props.dispatch(setFlags(res.length ? res : [false]));
-      });
+    dispatch(getFlags());
   };
 
   const retrieveSignUpStatus = () => {
-    fetch('/api/setting/signup/', { method: 'GET' })
-      .then((res) => res.json())
-      .then((res) => {
-        setCanSignUp(res.signUp);
-      });
+    settingsApi.signup().then((res) => {
+      setCanSignUp(res.signUp);
+    });
   };
 
   const toggleSignup = (e) => {
     e.preventDefault();
 
-    const url = '/api/setting/signup/toggle';
-
-    fetch(url, {
-      method: 'post',
-    })
-      .then((res) => res.json())
+    settingsApi
+      .toggleSignup()
       .then((res) => {
-        retrieveTags();
         setCanSignUp(res.signUp);
       })
       .catch((error) => {
@@ -98,11 +77,8 @@ const Dashboard = (props) => {
 
   const handleTagSubmit = (url, tagIds) => {
     if (tagIds.length) {
-      const urlSearchParams = new URLSearchParams({ tagIds });
-
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'post',
-      })
+      tagsApi
+        .toggleTagState(url, tagIds)
         .then(() => {
           retrieveTags();
           setShowTagForm(!showTagForm);
@@ -115,10 +91,14 @@ const Dashboard = (props) => {
     }
   };
 
+  const handleSelectUser = (id) => {
+    history.push(`/user/${id}`);
+  };
+
   return (
     <section className="container dashboard" id="account-dashboard">
       <ToastContainer />
-      {props.userInit && props.loggedIn ? (
+      {userInit && loggedIn ? (
         <div className="inner">
           <h1>
             <span>Admin</span>
@@ -126,8 +106,8 @@ const Dashboard = (props) => {
           <div className="left">
             <h2>Flags</h2>
             <div className="row">
-              <p>({props.flags[0] ? props.flags.length : '0'})</p>
-              {props.flags[0] ? (
+              <p>({flags[0] ? flags.length : '0'})</p>
+              {flags[0] ? (
                 <Link to="/flags" id="show-flags">
                   manage
                 </Link>
@@ -135,8 +115,8 @@ const Dashboard = (props) => {
             </div>
             <h2>Users</h2>
             <div className="row">
-              <p>({props.users[0] ? props.users.length : '0'})</p>
-              {props.users[0] ? (
+              <p>({users[0] ? users.length : '0'})</p>
+              {users[0] ? (
                 <button
                   id="show-users"
                   onClick={() => {
@@ -149,8 +129,8 @@ const Dashboard = (props) => {
             </div>
             <h2>Tags</h2>
             <div className="row">
-              <p>({props.tags[0] ? props.tags.length : '0'})</p>
-              {props.tags[0] ? (
+              <p>({tags[0] ? tags.length : '0'})</p>
+              {tags[0] ? (
                 <button
                   id="show-tags"
                   onClick={() => {
@@ -175,17 +155,17 @@ const Dashboard = (props) => {
             show={showTagForm}
             toggleShow={setShowTagForm}
             handleSubmit={handleTagSubmit}
-            tags={props.tags}
+            tags={tags}
           />
           <UserSelectForm
             show={showUserForm}
             toggleShow={setShowUserForm}
-            history={props.history}
-            users={props.users}
+            handleSelectUser={handleSelectUser}
+            users={users}
           />
         </div>
       ) : null}
-      <Loader show={!props.userInit} />
+      <Loader show={!userInit} />
     </section>
   );
 };
@@ -196,8 +176,6 @@ Dashboard.propTypes = {
   userInit: PropTypes.bool.isRequired,
   admin: PropTypes.bool.isRequired,
   history: PropTypes.object.isRequired,
-  tags: PropTypes.array.isRequired,
-  users: PropTypes.array.isRequired,
   flags: PropTypes.array.isRequired,
 };
 

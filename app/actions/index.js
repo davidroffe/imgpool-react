@@ -1,3 +1,12 @@
+import { fetchPosts, fetchPost } from '../api/posts';
+import postApi from '../api/posts';
+import { getTagsFromPosts } from '../utils/tags';
+import userApi from '../api/users';
+import flagApi from '../api/flags';
+import validate from '../utils/validate';
+
+const postsPerPage = process.env.POSTS_PER_PAGE;
+
 export function setTagsFromExistingPosts() {
   return function(dispatch, getState) {
     const posts = getState().posts.list;
@@ -7,95 +16,251 @@ export function setTagsFromExistingPosts() {
   };
 }
 
-function getTagsFromPosts(posts, searchQuery) {
-  let newTags = [];
-  let exists;
-
-  if (posts[0]) {
-    for (var i = 0; i < posts.length; i++) {
-      for (var j = 0; j < posts[i].tag.length; j++) {
-        exists = false;
-        let tag = posts[i].tag[j];
-
-        for (var k = 0; k < newTags.length; k++) {
-          if (newTags[k].id === tag.id) {
-            exists = true;
-          }
-        }
-
-        if (!exists) {
-          if (searchQuery !== undefined)
-            tag.active = searchQuery.indexOf(tag.name) > -1;
-          newTags.push(tag);
-        }
-      }
-    }
-  }
-  return newTags;
-}
-
 export const clearPost = () => ({
   type: 'CLEAR_POST',
 });
 
-export function fetchPost(id) {
-  return function(dispatch) {
-    const url = '/api/post/single';
-    const urlSearchParams = new URLSearchParams({
-      id: id,
-    });
-
+export function getPost(id) {
+  return async function(dispatch) {
     dispatch(clearPost());
-    return fetch(`${url}?${urlSearchParams}`, {
-      method: 'GET',
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        dispatch(setPost(res));
-        dispatch(setTags(getTagsFromPosts([res])));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+
+    const res = await fetchPost(id);
+
+    dispatch(setPost(res));
+    dispatch(setTags(getTagsFromPosts([res])));
   };
 }
 
-export function fetchPosts(
+export const deletePost = (id) => async (dispatch) => {
+  const res = await postApi.deletePost(id);
+
+  dispatch(setUser('favorites', res.favorites));
+  dispatch(setPosts({ posts: [], page: 1, totalCount: 0 }));
+  dispatch(setTags([]));
+};
+
+export function getPosts(
   { newSearchQuery, newPage } = {
     newSearchQuery: undefined,
     newPage: undefined,
   }
 ) {
-  return function(dispatch, getState) {
+  return async function(dispatch, getState) {
     const page = isNaN(newPage) ? 1 : newPage;
     const searchQuery =
       typeof newSearchQuery === 'string' ? newSearchQuery : getState().search;
-    const url = searchQuery.length ? '/api/post/search' : '/api/post/list';
-    const urlSearchParams = new URLSearchParams({ searchQuery, page });
 
     dispatch(setPage(page));
     dispatch(setPostsLoading(true));
 
+    const res = await fetchPosts(searchQuery, page, postsPerPage);
+    const newPosts = res.list.length
+      ? {
+          list: res.list,
+          page,
+          totalCount: res.totalCount,
+          loading: false,
+        }
+      : { list: [false], page: 1, totalCount: 0, loading: false };
+
+    dispatch(setSearch(searchQuery));
+    dispatch(setPosts(newPosts));
+    dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
+  };
+}
+
+export const createNewPost = (newPost) => async (dispatch) => {
+  const newErrorMessage = validate.createPostForm(newPost);
+
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    await postApi.createPost(newPost);
+    dispatch(setPosts({ list: [], page: 1, totalCount: 0 }));
+  }
+};
+
+export const signUp = (email, username, password, passwordConfirm) => async (
+  dispatch
+) => {
+  const newErrorMessage = [];
+
+  if (email === undefined || email === '') {
+    newErrorMessage.push('Please enter an email.');
+  }
+  if (password === undefined || password === '') {
+    newErrorMessage.push('Please enter a password.');
+  }
+  if (password !== passwordConfirm) {
+    newErrorMessage.push('Passwords do not match.');
+  }
+  if (password.length < 8) {
+    newErrorMessage.push('Password must be at least 8 characters.');
+  }
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    const user = await userApi.signup(
+      email,
+      username,
+      password,
+      passwordConfirm
+    );
+
+    dispatch(setUser('email', user.email));
+    dispatch(setUser('username', user.username));
+    dispatch(setUser('loggedIn', true));
+    dispatch(setUser('admin', user.admin));
+  }
+};
+
+export const login = (email, password) => async (dispatch) => {
+  let newErrorMessage = [];
+
+  if (email === undefined || email === '') {
+    newErrorMessage.push('Please enter an email.');
+  }
+  if (password === undefined || password === '') {
+    newErrorMessage.push('Please enter a password.');
+  }
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    const user = await userApi.login(email, password);
+
+    dispatch(setUser('email', user.email));
+    dispatch(setUser('username', user.username));
+    dispatch(setUser('loggedIn', true));
+    dispatch(setUser('admin', user.admin));
+  }
+};
+
+export const getCurrentUser = () => async (dispatch) => {
+  const res = await userApi.getCurrent();
+
+  if (res.valid) {
+    dispatch(setUser('id', res.id));
+    dispatch(setUser('username', res.username));
+    dispatch(setUser('email', res.email));
+    dispatch(setUser('bio', res.bio));
+    dispatch(setUser('loggedIn', true));
+    dispatch(setUser('admin', res.admin));
+    dispatch(setUser('favorites', res.favorites));
+    dispatch(setUser('init', true));
+  } else {
+    dispatch(clearUser());
+  }
+};
+
+export const forgotPassword = (email) => async () => {
+  const newErrorMessage = [];
+
+  if (email === undefined || email === '') {
+    newErrorMessage.push('Please enter an email.');
+  }
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    return await userApi.forgotPassword(email);
+  }
+};
+
+export const resetPassword = (
+  id,
+  password = null,
+  passwordConfirm = null,
+  passwordResetToken = null
+) => async (dispatch) => {
+  const editAccount = {
+    field: 'edit-password',
+    password,
+    passwordConfirm,
+  };
+  const newErrorMessage = validate.editForm(editAccount, null, null);
+
+  if (!id && newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
+    const res = await userApi.resetPassword(id, password, passwordResetToken);
+
+    if (!id) {
+      dispatch(setUser('email', res.email));
+      dispatch(setUser('username', res.username));
+      dispatch(setUser('loggedIn', true));
+    }
+
+    return res;
+  }
+};
+
+export const editUser = (id, editAccount, email, username) => (dispatch) => {
+  const url = '/api/user/edit/' + (id || '');
+  const urlSearchParams = new URLSearchParams({
+    currentEmail: email,
+    editField: editAccount.field,
+    email: editAccount.email,
+    username: editAccount.username,
+    bio: editAccount.bio,
+    password: editAccount.password,
+    passwordConfirm: editAccount.passwordConfirm,
+  });
+
+  const newErrorMessage = validate.editForm(editAccount, email, username);
+
+  if (newErrorMessage.length > 0) {
+    return new Promise((resolve, reject) => reject(newErrorMessage));
+  } else {
     return fetch(`${url}?${urlSearchParams}`, {
-      method: 'GET',
+      method: 'post',
     })
       .then((res) => res.json())
       .then((res) => {
-        const newPosts = res.list.length
-          ? {
-              list: res.list,
-              page,
-              totalCount: res.totalCount,
-              loading: false,
-            }
-          : { list: [false], page: 1, totalCount: 0, loading: false };
-
-        dispatch(setSearch(searchQuery));
-        dispatch(setPosts(newPosts));
-        dispatch(setTags(getTagsFromPosts(newPosts.list, searchQuery)));
+        if (res.status === 'success' && id !== null) {
+          dispatch(setUser('email', res.email));
+          dispatch(setUser('username', res.username));
+          dispatch(setUser('bio', res.bio));
+        }
+        return res;
       });
-  };
-}
+  }
+};
+
+export const getFlags = () => (dispatch) => {
+  flagApi.getFlags().then((res) => {
+    if (res.length) {
+      dispatch(
+        setFlags(
+          res.map((flag) => {
+            return {
+              ...flag,
+              date: new Date(flag.createdAt).toLocaleDateString(),
+              active: flag.post.active,
+              user: { id: flag.userId, username: flag.user.username },
+            };
+          })
+        )
+      );
+    } else {
+      dispatch(
+        setFlags([
+          {
+            id: 0,
+            postId: 0,
+            date: '',
+            user: { id: 0, username: '' },
+            active: true,
+            reason: '',
+          },
+        ])
+      );
+    }
+  });
+};
+
+export const setFlags = (flags) => ({
+  type: 'SET_FLAGS',
+  flags,
+});
 
 export const setPostsLoading = (state) => {
   return {
@@ -129,10 +294,9 @@ export const setUsers = (users) => ({
   users,
 });
 
-export const setFlags = (flags) => ({
-  type: 'SET_FLAGS',
-  flags,
-});
+export const createPostFlag = (postId, reason) => () => {
+  return flagApi.createPostFlag(postId, reason);
+};
 
 export const toggleTag = (tag) => ({
   type: 'TOGGLE_TAG',
@@ -159,6 +323,12 @@ export const setUser = (field, value) => ({
   type: `SET_${field.toUpperCase()}`,
   value,
 });
+
+export const setFavorite = (id) => (dispatch) => {
+  return userApi.setFavorite(id).then((res) => {
+    dispatch(setUser('favorites', res.favorites));
+  });
+};
 
 export const clearUser = () => ({
   type: 'CLEAR_USER',

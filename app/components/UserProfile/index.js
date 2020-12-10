@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { fetchPosts } from '../../actions';
+import { getPosts, editUser } from '../../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
+import userApi from '../../api/users';
 
 const mapStateToProps = (state) => {
   return {
@@ -14,7 +15,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const Dashboard = (props) => {
+export const UserProfile = (props) => {
   const [editAccount, setEditAccount] = useState({
     show: false,
     field: '',
@@ -31,9 +32,8 @@ const Dashboard = (props) => {
     bio: '',
   });
   useEffect(() => {
-    const url = `/api/user/get/${props.match.params.id}`;
-    fetch(url, { method: 'GET' })
-      .then((res) => res.json())
+    userApi
+      .getUser(props.match.params.id)
       .then((res) => {
         if (res.valid) {
           setUser({
@@ -49,13 +49,16 @@ const Dashboard = (props) => {
       })
       .catch(() => props.history.push('/404'));
   }, []);
+  useEffect(() => {
+    clearValues();
+  }, [user]);
   const clearValues = () => {
     setEditAccount({
       show: false,
       field: '',
-      email: '',
-      username: '',
-      bio: '',
+      email: user.email,
+      username: user.username,
+      bio: user.bio,
       password: '',
       passwordConfirm: '',
     });
@@ -74,93 +77,55 @@ const Dashboard = (props) => {
   const handleEditSubmit = (e) => {
     e.preventDefault();
 
-    const url = `/api/user/edit/${user.id}`;
-    let newErrorMessage = [];
-
-    if (editAccount.field === 'edit-email') {
-      if (editAccount.email === undefined || editAccount.email === '') {
-        newErrorMessage.push('Please enter an email.');
-      } else if (editAccount.email === user.email) {
-        newErrorMessage.push('Please use a different email.');
-      }
-    }
-    if (editAccount.field === 'edit-username') {
-      if (editAccount.username === undefined || editAccount.username === '') {
-        newErrorMessage.push('Please enter a username.');
-      } else if (editAccount.username === user.username) {
-        newErrorMessage.push('Please use a different username.');
-      }
-    }
-    if (editAccount.field === 'edit-bio') {
-      if (editAccount.bio === undefined) {
-        newErrorMessage.push('Error with bio.');
-      }
-    }
-    if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach((error) => {
-        toast.error(error);
-      });
-    } else {
-      const urlSearchParams = new URLSearchParams({
-        currentEmail: user.email,
-        editField: editAccount.field,
-        email: editAccount.email,
-        username: editAccount.username,
-        bio: editAccount.bio,
-      });
-
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'POST',
-      })
-        .then((res) => res.json())
-        .then((res) => {
+    props
+      .dispatch(editUser(user.id, editAccount, user.email, user.username))
+      .then((res) => {
+        setUser((user) => {
           if (res.status === 'success') {
-            setUser({
+            toast.success('Edit successful.');
+            return {
               ...user,
               email: res.email,
               username: res.username,
               bio: res.bio,
-            });
-
-            setEditAccount({
-              show: false,
-              field: '',
-              email: '',
-              username: '',
-              bio: '',
-              password: '',
-              passwordConfirm: '',
-            });
+            };
           }
-        })
-        .catch((error) => {
-          toast.error(error.response.data);
         });
-    }
+      })
+      .catch((error) => {
+        if (Array.isArray(error)) {
+          error.forEach((errorItem) => {
+            toast.error(errorItem);
+          });
+        } else {
+          toast.error(error);
+        }
+      });
   };
 
   const resetPassword = () => {
-    const url = `/api/user/password-reset/${user.id}`;
-
-    fetch(url, {
-      method: 'POST',
-    }).then(() => {});
+    userApi
+      .resetPassword(user.id)
+      .then(() => {
+        toast.success('An email has been sent to the user.');
+      })
+      .catch((res) => {
+        toast.error(res);
+      });
   };
 
   const handleToggleAccountSubmit = (e) => {
     e.preventDefault();
 
-    const url = `/api/user/${user.active ? 'disable' : 'enable'}/${user.id}`;
-
-    fetch(url, {
-      method: 'POST',
-    })
-      .then((res) => res.json())
+    userApi
+      .toggleAccountStatus(user)
       .then((res) => {
         setUser({
           ...user,
           active: res.active,
         });
+
+        toast.success(`Account ${res.active ? 'enabled' : 'disabled'}.`);
       })
       .catch((error) => {
         toast.error(error.response.data);
@@ -172,7 +137,7 @@ const Dashboard = (props) => {
 
     const newSearchQuery = `fp:${user.id}`;
     props.history.push('/posts');
-    props.dispatch(fetchPosts({ newSearchQuery }));
+    props.dispatch(getPosts({ newSearchQuery }));
   };
 
   const handlePostsClick = (e) => {
@@ -180,7 +145,7 @@ const Dashboard = (props) => {
 
     const newSearchQuery = `user:${user.id}`;
     props.history.push('/posts');
-    props.dispatch(fetchPosts({ newSearchQuery }));
+    props.dispatch(getPosts({ newSearchQuery }));
   };
 
   return (
@@ -241,7 +206,7 @@ const Dashboard = (props) => {
                 </button>
               </div>
             ) : null}
-            <div className="row">
+            <div className="row favorites">
               <h2>Favorites</h2>
               <p>
                 {user.favorites.length}{' '}
@@ -249,7 +214,7 @@ const Dashboard = (props) => {
               </p>
               <button onClick={handleFavoritesClick}>view</button>
             </div>
-            <div className="row">
+            <div className="row posts">
               <h2>Posts</h2>
               <p>
                 {user.post.length} {`post${user.post.length > 0 ? 's' : ''}`}
@@ -304,7 +269,7 @@ const Dashboard = (props) => {
   );
 };
 
-Dashboard.propTypes = {
+UserProfile.propTypes = {
   history: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
@@ -313,4 +278,4 @@ Dashboard.propTypes = {
   admin: PropTypes.bool.isRequired,
 };
 
-export default connect(mapStateToProps)(Dashboard);
+export default connect(mapStateToProps)(UserProfile);

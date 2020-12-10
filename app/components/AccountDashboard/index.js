@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { setUser, setPosts } from '../../actions';
+import { editUser, createNewPost } from '../../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import CreatePost from './CreatePost';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
+import userApi from '../../api/users';
 
 const mapStateToProps = (state) => {
   return {
@@ -17,7 +18,15 @@ const mapStateToProps = (state) => {
   };
 };
 
-const Dashboard = (props) => {
+const Dashboard = ({
+  dispatch,
+  history,
+  email,
+  username,
+  bio,
+  loggedIn,
+  userInit,
+}) => {
   const [editAccount, setEditAccount] = useState({
     show: false,
     field: '',
@@ -34,18 +43,21 @@ const Dashboard = (props) => {
     tags: '',
   });
   useEffect(() => {
-    if (props.userInit) {
-      if (!props.loggedIn) {
-        props.history.push('/login');
+    if (userInit) {
+      if (!loggedIn) {
+        history.push('/login');
       } else {
         clearValues();
       }
     }
-  }, [props]);
+  }, [userInit]);
+  useEffect(() => {
+    clearValues();
+  }, [email, username, bio]);
   const logout = (e) => {
     e.preventDefault();
 
-    fetch('/api/user/logout', { method: 'POST' }).then(() => {
+    userApi.logout().then(() => {
       window.location.reload();
     });
   };
@@ -53,9 +65,9 @@ const Dashboard = (props) => {
     setEditAccount({
       show: false,
       field: '',
-      email: '',
-      username: '',
-      bio: props.bio,
+      email,
+      username,
+      bio,
       password: '',
       passwordConfirm: '',
     });
@@ -90,127 +102,48 @@ const Dashboard = (props) => {
   const handleEditSubmit = (e) => {
     e.preventDefault();
 
-    const url = '/api/user/edit';
-    let newErrorMessage = [];
-
-    if (editAccount.field === 'edit-email') {
-      if (editAccount.email === undefined || editAccount.email === '') {
-        newErrorMessage.push('Please enter an email.');
-      } else if (editAccount.email === props.email) {
-        newErrorMessage.push('Please use a different email.');
-      }
-    }
-    if (editAccount.field === 'edit-username') {
-      if (editAccount.username === undefined || editAccount.username === '') {
-        newErrorMessage.push('Please enter a username.');
-      } else if (editAccount.username === props.username) {
-        newErrorMessage.push('Please use a different username.');
-      }
-    }
-    if (editAccount.field === 'edit-bio') {
-      if (editAccount.bio === undefined) {
-        newErrorMessage.push('Error with bio.');
-      }
-    }
-    if (editAccount.field === 'edit-password') {
-      if (editAccount.password === undefined || editAccount.password === '') {
-        newErrorMessage.push('Please enter a password.');
-      } else if (editAccount.password.length < 8) {
-        newErrorMessage.push('Password must be at least 8 characters.');
-      } else if (editAccount.passwordConfirm !== editAccount.password) {
-        newErrorMessage.push('Passwords do not match.');
-      }
-    }
-    if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach((error) => {
-        toast.error(error);
-      });
-    } else {
-      const urlSearchParams = new URLSearchParams({
-        currentEmail: props.email,
-        editField: editAccount.field,
-        email: editAccount.email,
-        username: editAccount.username,
-        bio: editAccount.bio,
-        password: editAccount.password,
-        passwordConfirm: editAccount.passwordConfirm,
-      });
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'post',
+    dispatch(editUser(null, editAccount, email, username))
+      .then((res) => {
+        if (res.status === 'success') {
+          clearValues();
+          toast.success('Edit successful.');
+        }
       })
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.status === 'success') {
-            props.dispatch(setUser('email', res.email));
-            props.dispatch(setUser('username', res.username));
-            props.dispatch(setUser('bio', res.bio));
-
-            setEditAccount({
-              show: false,
-              field: '',
-              email: '',
-              username: '',
-              bio: res.bio,
-              password: '',
-              passwordConfirm: '',
-            });
-          }
-        })
-        .catch((error) => {
+      .catch((error) => {
+        if (Array.isArray(error)) {
+          error.forEach((errorItem) => {
+            toast.error(errorItem);
+          });
+        } else {
           toast.error(error);
-        });
-    }
+        }
+      });
   };
 
   const handleCreatePostSubmit = (e) => {
     e.preventDefault();
 
-    const url = '/api/post/create';
-    let formData = new FormData();
-    const headers = {
-      'content-type': 'multipart/form-data',
-    };
-    let newErrorMessage = [];
-
-    if (createPost.file.name === undefined || createPost.file.name === '') {
-      newErrorMessage.push('Please select a file.');
-    }
-    if (createPost.tags.split(' ').length < 4) {
-      newErrorMessage.push(
-        'Minimum 4 space separated tags. ie: red race_car bmw m3'
-      );
-    }
-    if (newErrorMessage.length > 0) {
-      newErrorMessage.forEach((error) => {
-        toast.error(error);
-      });
-    } else {
-      const urlSearchParams = new URLSearchParams({
-        source: createPost.source,
-        tags: createPost.tags,
-      });
-      formData.append('image', createPost.file.value);
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'POST',
-        headers,
-        body: formData,
+    dispatch(createNewPost(createPost))
+      .then((res) => {
+        if (res.status === 'success') {
+          clearValues();
+          toast.success('Post creation successful.');
+        }
       })
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.status === 'success') {
-            clearValues();
-            props.dispatch(setPosts({ list: [], page: 1, totalCount: 0 }));
-          }
-        })
-        .catch((error) => {
+      .catch((error) => {
+        if (Array.isArray(error)) {
+          error.forEach((errorItem) => {
+            toast.error(errorItem);
+          });
+        } else {
           toast.error(error);
-        });
-    }
+        }
+      });
   };
   return (
     <section className="container dashboard" id="account-dashboard">
       <ToastContainer />
-      {props.userInit && props.loggedIn ? (
+      {userInit && loggedIn ? (
         <div className="inner">
           <h1>
             <span>Account</span>
@@ -218,7 +151,7 @@ const Dashboard = (props) => {
           <div className="left">
             <h2>Username</h2>
             <div className="row">
-              <p>{props.username}</p>
+              <p>{username}</p>
               <button
                 id="edit-username"
                 onClick={() =>
@@ -234,7 +167,7 @@ const Dashboard = (props) => {
             </div>
             <h2>Email</h2>
             <div className="row">
-              <p>{props.email}</p>
+              <p>{email}</p>
               <button
                 id="edit-email"
                 onClick={() =>
@@ -266,7 +199,7 @@ const Dashboard = (props) => {
             </div>
             <h2>Bio</h2>
             <div className="row">
-              {props.bio ? <p>{props.bio}</p> : null}
+              {bio ? <p>{bio}</p> : null}
               <button
                 id="edit-bio"
                 onClick={() =>
@@ -314,7 +247,7 @@ const Dashboard = (props) => {
           />
         </div>
       ) : null}
-      <Loader show={!props.userInit && !props.loggedIn} />
+      <Loader show={!userInit && !loggedIn} />
     </section>
   );
 };

@@ -13,6 +13,14 @@ describe('PostSingle', () => {
       },
     },
     dispatch: mockDispatch,
+    post: {
+      id: '',
+      tag: [],
+      user: {
+        id: '',
+        username: '',
+      },
+    },
     isAdmin: false,
     userId: 1,
     userFavorites: [],

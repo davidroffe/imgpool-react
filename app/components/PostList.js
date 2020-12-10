@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { fetchPosts, setTagsFromExistingPosts } from '../actions';
+import { getPosts, setTagsFromExistingPosts } from '../actions';
 import PropTypes from 'prop-types';
 import TagMenu from './TagMenu';
+import Paginator from './Paginator';
+import PostListItem from './PostListItem';
 import Loader from './Utility/Loader';
+import Splash from './Splash';
 
 const mapStateToProps = (state) => {
   return {
@@ -12,137 +14,61 @@ const mapStateToProps = (state) => {
   };
 };
 
-const PostList = (props) => {
+export const PostList = ({ posts, dispatch }) => {
+  const postsPerPage = process.env.POSTS_PER_PAGE;
   const [lastPage, setLastPage] = useState(
-    Math.ceil(props.posts.totalCount / 18)
+    Math.ceil(posts.totalCount / postsPerPage)
   );
 
   useEffect(() => {
-    if (!props.posts.list.length && !props.posts.loading) {
-      props.dispatch(fetchPosts());
+    if (!posts.list.length && !posts.loading) {
+      dispatch(getPosts());
     }
-    props.dispatch(setTagsFromExistingPosts());
-    setLastPage(Math.ceil(props.posts.totalCount / 18));
-  }, [props.posts]);
+    dispatch(setTagsFromExistingPosts());
+    setLastPage(Math.ceil(posts.totalCount / postsPerPage));
+  }, [posts]);
 
   const changePage = (page, e) => {
     e.preventDefault();
 
     if (page === 'next') {
-      page = props.posts.page + 1;
+      page = posts.page + 1;
     } else if (page === 'prev') {
-      page = props.posts.page - 1;
+      page = posts.page - 1;
     }
-    props.dispatch(fetchPosts({ newPage: page }));
+    dispatch(getPosts({ newPage: page }));
   };
 
-  if (!props.posts.list[0] && !props.posts.loading) {
-    return (
-      <section id="splash">
-        <div id="splash-center">
-          <h1>IMGPOOL</h1>
-        </div>
-      </section>
-    );
+  if (!posts.list[0] && !posts.loading) {
+    return <Splash />;
   } else {
     return (
       <div>
         <TagMenu />
-        {props.posts.loading ? (
+        {posts.loading ? (
           <section id="post-list">
-            <Loader show={props.posts.loading} />
+            <Loader show={posts.loading} />
           </section>
         ) : (
           <section id="post-list">
-            {props.posts.list.map((post, index) => {
+            {posts.list.map((post) => {
               return (
-                <Link key={index} to={'/post/' + post.id} className="post-item">
-                  <img
-                    src={post.thumbUrl}
-                    alt={post.tag.map((tag) => {
-                      return tag.name;
-                    })}
-                  />
-                </Link>
+                <PostListItem
+                  key={post.id}
+                  id={post.id}
+                  thumbUrl={post.thumbUrl}
+                  tags={post.tag}
+                />
               );
             })}
           </section>
         )}
-
-        <aside className="paginator">
-          <button
-            className="previous"
-            disabled={props.posts.page < 2 || props.posts.loading}
-            onClick={changePage.bind(null, 'prev')}
-          >
-            ←
-          </button>
-          {props.posts.page >= 6 ? (
-            <button
-              disabled={props.posts.loading}
-              className="number"
-              onClick={changePage.bind(null, 1)}
-            >
-              1
-            </button>
-          ) : null}
-
-          {[...Array(5)].map((el, i) => {
-            const pageLink = props.posts.page - (i + 1);
-
-            if (pageLink > 0) {
-              return (
-                <button
-                  key={i}
-                  disabled={props.posts.loading}
-                  className="number"
-                  onClick={changePage.bind(null, pageLink)}
-                >
-                  {pageLink}
-                </button>
-              );
-            }
-          })}
-          <button
-            disabled={props.posts.loading}
-            className="number active"
-            onClick={changePage.bind(null, props.posts.page)}
-          >
-            {props.posts.page}
-          </button>
-          {[...Array(5)].map((el, i) => {
-            const pageLink = props.posts.page + (i + 1);
-
-            if (pageLink <= lastPage) {
-              return (
-                <button
-                  disabled={props.posts.loading}
-                  key={i}
-                  className="number"
-                  onClick={changePage.bind(null, pageLink)}
-                >
-                  {pageLink}
-                </button>
-              );
-            }
-          })}
-          {props.posts.page <= lastPage - 6 ? (
-            <button
-              disabled={props.posts.loading}
-              className="number"
-              onClick={changePage.bind(null, lastPage)}
-            >
-              {lastPage}
-            </button>
-          ) : null}
-          <button
-            className="next"
-            disabled={lastPage === props.posts.page || props.posts.loading}
-            onClick={changePage.bind(null, 'next')}
-          >
-            →
-          </button>
-        </aside>
+        <Paginator
+          changePage={changePage}
+          page={posts.page}
+          lastPage={lastPage}
+          loading={posts.loading}
+        />
       </div>
     );
   }

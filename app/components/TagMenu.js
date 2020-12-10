@@ -1,8 +1,10 @@
 import React from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { fetchPosts, setMenu, closeAllMenusExcept } from '../actions';
+import { getPosts, setMenu, closeAllMenusExcept } from '../actions';
+import TagMenuItem from './TagMenuItem';
+import BurgerButton from './Utility/BurgerButton';
 
 const mapStateToProps = (state) => {
   return {
@@ -45,7 +47,7 @@ export const TagMenu = (props) => {
     newSearchQuery =
       newSearchQuery.length > 1 ? newSearchQuery.join(' ') : newSearchQuery[0];
 
-    props.dispatch(fetchPosts({ newSearchQuery })).then(() => {
+    props.dispatch(getPosts({ newSearchQuery })).then(() => {
       props.history.push('/posts');
     });
   };
@@ -54,29 +56,16 @@ export const TagMenu = (props) => {
     <aside id="tag-menu" className={props.showMenu ? 'active' : ''}>
       <div className="body" onClick={handleMenuClick}>
         <nav>
-          {props.tags.map((tag, index) => {
-            return (
-              <Link
-                key={index}
-                to={'post?tag=' + tag.id}
-                className={'tag ' + tag.active}
-                onClick={handleTagClick.bind(this, tag)}
-                active={tag.active ? '' : null}
-              >
-                {tag.name}
-              </Link>
-            );
-          })}
+          {props.tags.map((tag, index) => (
+            <TagMenuItem
+              key={index}
+              tag={tag}
+              handleTagClick={handleTagClick}
+            />
+          ))}
         </nav>
       </div>
-      <button className="tab" onClick={toggleMenu}>
-        <span className="burger">
-          <span className="line"></span>
-          <span className="line"></span>
-          <span className="line"></span>
-        </span>
-        <span className="text">View Tags</span>
-      </button>
+      <BurgerButton onClick={toggleMenu} />
     </aside>
   );
 };

@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
-  setUser,
-  fetchPost,
-  setPosts,
+  setFavorite,
+  deletePost,
+  getPost,
   setMenu,
-  setTags,
+  createPostFlag,
   closeAllMenusExcept,
 } from '../actions';
 import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
+import PostOptionsMenu from './PostOptionsMenu';
 import TagMenu from './TagMenu';
 import FlagPost from './FlagPost';
 import Loader from './Utility/Loader';
@@ -25,72 +26,69 @@ const mapStateToProps = (state) => {
   };
 };
 
-export const PostSingle = (props) => {
+export const PostSingle = ({
+  dispatch,
+  match,
+  post,
+  optionsMenu,
+  userFavorites,
+  history,
+  userId,
+  isAdmin,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [flagPost, setFlagPost] = useState({
     show: false,
     reason: '',
   });
   useEffect(() => {
-    if (isNaN(props.match.params.id)) {
-      props.history.push('/404');
+    if (isNaN(match.params.id)) {
+      history.push('/404');
       return;
     }
-    if (props.post.id === '' || props.post.id != props.match.params.id) {
+    if (post.id === '' || post.id != match.params.id) {
       setIsLoading(true);
-      props.dispatch(fetchPost(props.match.params.id)).catch(() => {
-        props.history.push('/404');
+      dispatch(getPost(match.params.id)).catch(() => {
+        history.push('/404');
       });
     }
   }, []);
 
   const toggleFavorite = (e) => {
     e.preventDefault();
-    const url = '/api/post/favorite';
-    const urlSearchParams = new URLSearchParams({ postId: props.post.id });
 
-    fetch(`${url}?${urlSearchParams}`, {
-      method: 'POST',
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        toast.success(
-          `Post ${isFavorited() ? 'removed from' : 'added to'} favorites.`
-        );
-        props.dispatch(setUser('favorites', res.favorites));
-      });
+    dispatch(setFavorite(post.id)).then(() => {
+      toast.success(
+        `Post ${isFavorited() ? 'removed from' : 'added to'} favorites.`
+      );
+    });
   };
 
   const handleMenuClick = (e) => {
     e.stopPropagation();
 
-    props.dispatch(closeAllMenusExcept('POST_OPTIONS_MENU'));
+    dispatch(closeAllMenusExcept('POST_OPTIONS_MENU'));
   };
 
   const toggleOptionsMenu = (e) => {
     e.stopPropagation();
-    props.dispatch(setMenu('POST_OPTIONS_MENU', !props.optionsMenu));
+    dispatch(setMenu('POST_OPTIONS_MENU', !optionsMenu));
   };
 
   const isFavorited = () => {
-    for (let i = 0; i < props.userFavorites.length; i++) {
-      if (props.userFavorites[i].id === props.post.id) return true;
+    for (let i = 0; i < userFavorites.length; i++) {
+      if (userFavorites[i].id === post.id) return true;
     }
     return false;
   };
 
-  const deletePost = (e) => {
+  const handleDeletePost = (e) => {
     e.preventDefault();
-    const url = `/api/post/delete/${props.post.id}`;
 
-    fetch(url, {
-      method: 'POST',
-    })
+    dispatch(deletePost(post.id))
       .then(() => {
         toast.success('Post deleted.');
-        props.dispatch(setPosts({ posts: [], page: 1, totalCount: 0 }));
-        props.dispatch(setTags([]));
-        props.history.push('/posts');
+        history.push('/posts');
       })
       .catch((error) => {
         toast.error(error);
@@ -117,16 +115,7 @@ export const PostSingle = (props) => {
         toast.error(error);
       });
     } else {
-      const url = '/api/post/flag/create';
-      const urlSearchParams = new URLSearchParams({
-        postId: props.post.id,
-        reason: flagPost.reason,
-      });
-
-      fetch(`${url}?${urlSearchParams}`, {
-        method: 'POST',
-      })
-        .then((res) => res.json())
+      dispatch(createPostFlag(post.id, flagPost.reason))
         .then((res) => {
           if (res.status === 'success') {
             setFlagPost({
@@ -155,65 +144,29 @@ export const PostSingle = (props) => {
         <div className="inner">
           {!isLoading ? (
             <div className="post-info">
-              {props.userId ? (
-                <div>
-                  <button
-                    className="toggle-options"
-                    onClick={toggleOptionsMenu}
-                  >
-                    options <span>+</span>
-                  </button>
-                  <ul
-                    className={`options${props.optionsMenu ? ' active' : ''}`}
-                    onClick={handleMenuClick}
-                  >
-                    <li>
-                      <button
-                        className={`toggle-fav${
-                          isFavorited() ? ' favorited' : ''
-                        }`}
-                        onClick={toggleFavorite}
-                      >
-                        <span className="icon">&hearts;</span>
-                        <span className="text add">add to favorites</span>
-                        <span className="text remove">
-                          remove from favorites
-                        </span>
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        className="flag-post"
-                        onClick={() => {
-                          setFlagPost({ ...flagPost, show: true });
-                        }}
-                      >
-                        <span className="icon flag">&#9873;</span>
-                        <span className="text">flag post</span>
-                      </button>
-                    </li>
-                    {props.post.userId === props.userId || props.isAdmin ? (
-                      <li>
-                        <button className="delete-post" onClick={deletePost}>
-                          <span className="icon x">×</span>
-                          <span className="text">delete post</span>
-                        </button>
-                      </li>
-                    ) : null}
-                  </ul>
-                </div>
+              {userId ? (
+                <PostOptionsMenu
+                  toggleMenu={toggleOptionsMenu}
+                  optionsMenu={optionsMenu}
+                  handleMenuClick={handleMenuClick}
+                  isFavorited={isFavorited()}
+                  toggleFavorite={toggleFavorite}
+                  setFlagPost={setFlagPost}
+                  flagPost={flagPost}
+                  deletePost={handleDeletePost}
+                  isUploader={post.userId === userId}
+                  isAdmin={isAdmin}
+                />
               ) : (
-                <div></div>
+                <div />
               )}
               <p className="poster">
                 posted by:{' '}
-                <Link to={`/user/${props.post.user.id}`}>
-                  {props.post.user.username}
-                </Link>
+                <Link to={`/user/${post.user.id}`}>{post.user.username}</Link>
               </p>
             </div>
           ) : null}
-          <img onLoad={() => setIsLoading(false)} src={props.post.url} />
+          <img onLoad={() => setIsLoading(false)} src={post.url} />
         </div>
       </div>
       <FlagPost
