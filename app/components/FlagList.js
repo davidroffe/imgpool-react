@@ -22,6 +22,28 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 function desc(a, b, orderBy) {
+  if (orderBy === 'date') {
+    if (Date.parse(b[orderBy]) < Date.parse(a[orderBy])) {
+      return -1;
+    }
+    if (Date.parse(b[orderBy]) > Date.parse(a[orderBy])) {
+      return 1;
+    }
+  } else if (orderBy === 'user') {
+    if (b[orderBy].username < a[orderBy].username) {
+      return -1;
+    }
+    if (b[orderBy].username > a[orderBy].username) {
+      return 1;
+    }
+  } else if (orderBy === 'status') {
+    if (b.post.active > a.post.active) {
+      return -1;
+    }
+    if (b.post.active < a.post.active) {
+      return 1;
+    }
+  }
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -48,12 +70,7 @@ function getSorting(order, orderBy) {
 }
 
 const headCells = [
-  {
-    id: 'postId',
-    numeric: false,
-    disablePadding: true,
-    label: 'Post',
-  },
+  { id: 'postId', numeric: false, disablePadding: true, label: 'Post' },
   { id: 'date', numeric: true, disablePadding: false, label: 'Date' },
   { id: 'user', numeric: true, disablePadding: false, label: 'User' },
   { id: 'status', numeric: true, disablePadding: false, label: 'Status' },
