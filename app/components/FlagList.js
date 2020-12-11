@@ -252,18 +252,18 @@ const FlagList = (props) => {
     setOrderBy(property);
   };
 
-  const handleClick = (event, clickedIndex) => {
+  const handleClick = (event, clickedFlag) => {
     if (!props.isAdmin) return;
-    const selectedIndex = selected.indexOf(clickedIndex);
+
+    const selectedIndex = selected.indexOf(clickedFlag);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected.push(...selected, clickedIndex);
+      newSelected.push(...selected, clickedFlag);
     } else if (selectedIndex > -1) {
-      newSelected = [
-        ...selected.slice(0, selectedIndex),
-        ...selected.slice(selectedIndex + 1),
-      ];
+      newSelected = selected.filter((flag) => {
+        if (flag && flag.id !== clickedFlag.id) return flag;
+      });
     }
 
     setSelected(newSelected);
@@ -307,13 +307,13 @@ const FlagList = (props) => {
                 {stableSort(props.flags, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
-                    const isItemSelected = isSelected(index);
+                    const isItemSelected = isSelected(row);
                     const labelId = `enhanced-table-checkbox-${index}`;
 
                     return (
                       <TableRow
                         hover
-                        onClick={(event) => handleClick(event, index)}
+                        onClick={(event) => handleClick(event, row)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
