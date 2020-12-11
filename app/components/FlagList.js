@@ -22,6 +22,28 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 function desc(a, b, orderBy) {
+  if (orderBy === 'date') {
+    if (Date.parse(b[orderBy]) < Date.parse(a[orderBy])) {
+      return -1;
+    }
+    if (Date.parse(b[orderBy]) > Date.parse(a[orderBy])) {
+      return 1;
+    }
+  } else if (orderBy === 'user') {
+    if (b[orderBy].username < a[orderBy].username) {
+      return -1;
+    }
+    if (b[orderBy].username > a[orderBy].username) {
+      return 1;
+    }
+  } else if (orderBy === 'status') {
+    if (b.post.active > a.post.active) {
+      return -1;
+    }
+    if (b.post.active < a.post.active) {
+      return 1;
+    }
+  }
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -48,12 +70,7 @@ function getSorting(order, orderBy) {
 }
 
 const headCells = [
-  {
-    id: 'postId',
-    numeric: false,
-    disablePadding: true,
-    label: 'Post',
-  },
+  { id: 'postId', numeric: false, disablePadding: true, label: 'Post' },
   { id: 'date', numeric: true, disablePadding: false, label: 'Date' },
   { id: 'user', numeric: true, disablePadding: false, label: 'User' },
   { id: 'status', numeric: true, disablePadding: false, label: 'Status' },
@@ -252,18 +269,18 @@ const FlagList = (props) => {
     setOrderBy(property);
   };
 
-  const handleClick = (event, clickedIndex) => {
+  const handleClick = (event, clickedFlag) => {
     if (!props.isAdmin) return;
-    const selectedIndex = selected.indexOf(clickedIndex);
+
+    const selectedIndex = selected.indexOf(clickedFlag);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected.push(...selected, clickedIndex);
+      newSelected.push(...selected, clickedFlag);
     } else if (selectedIndex > -1) {
-      newSelected = [
-        ...selected.slice(0, selectedIndex),
-        ...selected.slice(selectedIndex + 1),
-      ];
+      newSelected = selected.filter((flag) => {
+        if (flag && flag.id !== clickedFlag.id) return flag;
+      });
     }
 
     setSelected(newSelected);
@@ -307,13 +324,13 @@ const FlagList = (props) => {
                 {stableSort(props.flags, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
-                    const isItemSelected = isSelected(index);
+                    const isItemSelected = isSelected(row);
                     const labelId = `enhanced-table-checkbox-${index}`;
 
                     return (
                       <TableRow
                         hover
-                        onClick={(event) => handleClick(event, index)}
+                        onClick={(event) => handleClick(event, row)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
