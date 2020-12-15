@@ -16,8 +16,8 @@
     "init": "node init.js",
     "server:dev": "NODE_ENV=development node server-build/server.js",
     "server:prod": "NODE_ENV=production node server-build/server.js",
-    "build:client:dev": "webpack --env.environment=development && ln -s ../uploads ./public/uploads",
-    "build:client:prod": "webpack --env.environment=production && ln -s ../uploads ./public/uploads",
+    "build:client:dev": "webpack --env.environment=development",
+    "build:client:prod": "webpack --env.environment=production",
     "build:server:dev": "webpack --env.environment=development --config webpack.server.js",
     "build:server:prod": "webpack --env.environment=production --config webpack.server.js",
     "test": "jest"
