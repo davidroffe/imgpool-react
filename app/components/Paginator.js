@@ -5,26 +5,23 @@ const Paginator = ({ loading, page, lastPage, changePage }) => {
   return (
     <div className="paginator">
       <button
+        className="first"
+        disabled={page < 2 || loading}
+        onClick={changePage.bind(null, 1)}
+      >
+        ⇤
+      </button>
+      <button
         className="previous"
         disabled={page < 2 || loading}
         onClick={changePage.bind(null, 'prev')}
       >
         ←
       </button>
-      {page >= 6 ? (
-        <button
-          disabled={loading}
-          className="number"
-          onClick={changePage.bind(null, 1)}
-        >
-          1
-        </button>
-      ) : null}
+      {[...Array(2)].reverse().map((el, i) => {
+        const pageLink = i + 1;
 
-      {[...Array(5)].map((el, i) => {
-        const pageLink = page - (i + 1);
-
-        if (pageLink > 0) {
+        if (pageLink < page) {
           return (
             <button
               key={i}
@@ -44,7 +41,7 @@ const Paginator = ({ loading, page, lastPage, changePage }) => {
       >
         {page}
       </button>
-      {[...Array(5)].map((el, i) => {
+      {[...Array(2)].map((el, i) => {
         const pageLink = page + (i + 1);
 
         if (pageLink <= lastPage) {
@@ -60,21 +57,19 @@ const Paginator = ({ loading, page, lastPage, changePage }) => {
           );
         }
       })}
-      {page <= lastPage - 6 ? (
-        <button
-          disabled={loading}
-          className="number"
-          onClick={changePage.bind(null, lastPage)}
-        >
-          {lastPage}
-        </button>
-      ) : null}
       <button
         className="next"
         disabled={lastPage === page || loading}
         onClick={changePage.bind(null, 'next')}
       >
         →
+      </button>
+      <button
+        className="next"
+        disabled={lastPage === page || loading}
+        onClick={changePage.bind(null, lastPage)}
+      >
+        ⇥
       </button>
     </div>
   );
