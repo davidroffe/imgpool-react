@@ -18,22 +18,25 @@ const Paginator = ({ loading, page, lastPage, changePage }) => {
       >
         ←
       </button>
-      {[...Array(2)].reverse().map((el, i) => {
-        const pageLink = i + 1;
+      {[...Array(2)]
+        .map((el, i) => i)
+        .reverse()
+        .map((el, i) => {
+          const pageLink = page - (el + 1);
 
-        if (pageLink < page) {
-          return (
-            <button
-              key={i}
-              disabled={loading}
-              className="number"
-              onClick={changePage.bind(null, pageLink)}
-            >
-              {pageLink}
-            </button>
-          );
-        }
-      })}
+          if (pageLink < page && pageLink > 0) {
+            return (
+              <button
+                key={i}
+                disabled={loading}
+                className="number"
+                onClick={changePage.bind(null, pageLink)}
+              >
+                {pageLink}
+              </button>
+            );
+          }
+        })}
       <button
         disabled={loading}
         className="number active"
