@@ -25,6 +25,17 @@ export const PostSearch = (props) => {
     e.preventDefault();
     setSearchField(e.target.value.toLowerCase());
   };
+  const clearSearch = (e) => {
+    e.preventDefault();
+
+    setSearchField('');
+
+    if (props.searchQuery.length > 0) {
+      props.dispatch(getPosts({ newSearchQuery: '' })).then(() => {
+        props.history.push('/posts');
+      });
+    }
+  };
   return (
     <form className="search" onSubmit={handleSubmit}>
       <input
@@ -34,6 +45,11 @@ export const PostSearch = (props) => {
         value={searchField}
         onChange={handleChange}
       />
+      {searchField.length > 0 ? (
+        <button id="clear-search" onClick={clearSearch}>
+          ✕
+        </button>
+      ) : null}
     </form>
   );
 };

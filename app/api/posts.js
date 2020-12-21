@@ -28,7 +28,15 @@ export default {
 
     return fetch(url, {
       method: 'POST',
-    });
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        try {
+          return JSON.parse(res);
+        } catch (error) {
+          throw res;
+        }
+      });
   },
   createPost: (newPost) => {
     const url = '/api/post/create';
