@@ -15,10 +15,10 @@
   "scripts": {
     "init": "node init.js",
     "dev": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel build:dev server:dev",
-    "server:dev": "node_modules/nodemon/bin/nodemon.js \"./server-build/server.js\"",
+    "server:dev": "NODE_ENV=development node_modules/nodemon/bin/nodemon.js \"./server-build/server.js\"",
     "server:prod": "NODE_ENV=production node server-build/server.js",
-    "build:dev": "node_modules/parallel-webpack/bin/run.js --watch --env.environment=development",
-    "build:prod": "node_modules/parallel-webpack/bin/run.js --env.environment=production",
+    "build:dev": "node_modules/webpack/bin/webpack.js --watch --mode development",
+    "build:prod": "node_modules/webpack/bin/webpack.js --mode production",
     "test": "jest"
   },
   "author": "David Roffe <davidroffe@gmail.com>",
