@@ -34,9 +34,7 @@ export function getPost(id) {
 export const deletePost = (id) => async (dispatch) => {
   const res = await postApi.deletePost(id);
 
-  dispatch(setUser('favorites', res.favorites));
-  dispatch(setPosts({ posts: [], page: 1, totalCount: 0 }));
-  dispatch(setTags([]));
+  dispatch(setPosts({ list: [], page: 1, totalCount: 0 }));
 };
 
 export function getPosts(
