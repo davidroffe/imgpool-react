@@ -103,48 +103,6 @@ body {
       }
     }
   }
-  .search {
-    position: relative;
-    align-self: flex-end;
-    @media (max-width: @mobile) {
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    input {
-      height: 40px;
-      width: 300px;
-      border: none;
-      background: rgba(0, 0, 0, 0.6);
-      outline: none;
-      color: @faded_white;
-      padding: 5px 30px 5px 10px;
-      font-size: 1.2rem;
-      font-family: sans-serif;
-      font-weight: 600;
-      text-transform: uppercase;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04),
-        -6px 8px 15px rgba(0, 0, 0, 0.04), 6px 8px 15px rgba(0, 0, 0, 0.04);
-      &::placeholder {
-        color: @faded_white;
-      }
-      @media (max-width: @mobile) {
-        width: 100%;
-      }
-    }
-
-    #clear-search {
-      position: absolute;
-      top: 50%;
-      right: 5px;
-      transform: translateY(-50%);
-      border: none;
-      background: none;
-      outline: none;
-      color: @faded_white;
-      cursor: pointer;
-    }
-  }
 }
 //App Views
 .container {
