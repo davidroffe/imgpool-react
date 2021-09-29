@@ -28,17 +28,10 @@ module.exports = [
           ],
         },
         {
-          test: /\.less$/,
+          test: /\.css$/,
           use: [
-            'style-loader', // creates style nodes from JS strings
-            {
-              loader: MiniCssExtractPlugin.loader,
-              options: {
-                publicPath: path.resolve(__dirname, 'public'),
-              },
-            },
+            'to-string-loader',
             'css-loader', // translates CSS into CommonJS
-            'less-loader', // compiles Less to CSS
           ],
         },
         {

@@ -1,13 +1,9 @@
+import ReactToastifyCss from 'react-toastify/dist/ReactToastify.css';
 import { createGlobalStyle } from 'styled-components';
-import GeosansLight from "../assets/fonts/GeosansLight.ttf";
-import FjallaOneRegular from "../assets/fonts/FjallaOne-Regular.ttf";
-import VarelaRoundRegular from "../assets/fonts/VarelaRound-Regular.ttf";
-import RobotoLight from "../assets/fonts/Roboto-Light.ttf";
-import RobotoRegular from "../assets/fonts/Roboto-Regular.ttf";
-import RobotoMedium from "../assets/fonts/Roboto-Medium.ttf";
-import RobotoBold from "../assets/fonts/Roboto-Bold.ttf";
 
 export default createGlobalStyle`
+${ReactToastifyCss}
+
 html,
 body,
 div,
@@ -134,54 +130,6 @@ html {
   box-sizing: border-box;
   -ms-overflow-style: none;  // IE 10+
   scrollbar-width: none;  // Firefox
-}
-
-@font-face {
-  font-family: geo_sans_light;
-  src: local(geo_sans_light),
-  url(${GeosansLight}), format('truetype');
-}
-@font-face {
-font-family: 'Fjalla One';
-font-style: normal;
-font-weight: 400;
-src: local('Fjalla One'),
-url(${FjallaOneRegular}), format('truetype');
-}
-@font-face {
-font-family: 'Varela Round';
-font-style: normal;
-font-weight: 400;
-src: local('Varela Round'),
-url(${VarelaRoundRegular}), format('truetype');
-}
-@font-face {
-font-family: 'Roboto';
-font-style: normal;
-font-weight: 300;
-src: local('Roboto'),
-url(${RobotoLight}), format('truetype');
-}
-@font-face {
-font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-src: local('Roboto'),
-url(${RobotoRegular}), format('truetype');
-}
-@font-face {
-font-family: 'Roboto';
-font-style: normal;
-font-weight: 500;
-src: local('Roboto'),
-url(${RobotoMedium}), format('truetype');
-}
-@font-face {
-font-family: 'Roboto';
-font-style: normal;
-font-weight: 700;
-src: local('Roboto'),
-url(${RobotoBold}), format('truetype');
 }
 
 body {
