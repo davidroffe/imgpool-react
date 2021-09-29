@@ -1,9 +1,73 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { login, signUp, forgotPassword } from '../actions';
 import settingsApi from '../api/setting';
 import { ToastContainer, toast } from 'react-toastify';
+import BorderButton from './Utility/BorderButton';
+import Input from './Utility/Input';
+
+const StyledContainer = styled.div`
+  width: 540px;
+  margin: 200px auto 0;
+  @media (max-width: 720px) {
+    width: 100%;
+    margin-top: 100px;
+  }
+
+  #center-box {
+    width: 520px;
+    margin: 50px auto 0;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 25px 0;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04),
+      -6px 8px 15px rgba(0, 0, 0, 0.04), 6px 8px 15px rgba(0, 0, 0, 0.04);
+    @media (max-width: 720px) {
+      width: 100%;
+    }
+    > form {
+      width: 400px;
+      margin: 0 auto;
+      @media (max-width: 720px) {
+        width: 100%;
+      }
+    }
+
+    button.switch-form {
+      background: none;
+      border: none;
+      color: inherit;
+      float: none;
+      padding: 0;
+      width: auto;
+      font-weight: inherit;
+      font-family: inherit;
+      font-size: inherit;
+      margin: 0;
+      outline: none;
+      cursor: pointer;
+    }
+
+    button.switch-form:hover {
+      text-decoration: underline;
+    }
+
+    form p {
+      color: #fff;
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    > form p a {
+      color: #e96333;
+    }
+
+    > form p a:hover {
+      text-decoration: underline;
+    }
+  }
+`;
 
 const mapStateToProps = (state) => {
   return {
@@ -94,12 +158,12 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
   };
 
   return (
-    <div id="account-center">
+    <StyledContainer>
       <ToastContainer />
       <div id="center-box">
         <form className="form-dark" onSubmit={handleSubmit}>
           <div className="field-container">
-            <input
+            <Input
               id="email"
               autoComplete={'off'}
               type={'text'}
@@ -110,7 +174,7 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
               onChange={(e) => setEmail(e.target.value)}
             />
             {form === 'signUp' ? (
-              <input
+              <Input
                 id="username"
                 autoComplete={'off'}
                 type={'text'}
@@ -122,7 +186,7 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
               />
             ) : null}
             {form === 'signUp' || form === 'login' ? (
-              <input
+              <Input
                 id="password"
                 autoComplete={'off'}
                 type={'password'}
@@ -134,7 +198,7 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
               />
             ) : null}
             {form === 'signUp' ? (
-              <input
+              <Input
                 id="passwordConfirm"
                 autoComplete={'off'}
                 type={'password'}
@@ -147,10 +211,8 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
             ) : null}
           </div>
           {form === 'signUp' ? <div id="recaptcha"></div> : null}
-          <input
-            className="border-button"
-            type="submit"
-            value={(() => {
+          <BorderButton type="submit" value=
+          {(() => {
               switch (form) {
                 case 'login':
                   return 'LOGIN';
@@ -159,8 +221,7 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
                 case 'forgotPassword':
                   return 'SEND EMAIL';
               }
-            })()}
-          />
+            })()} as="input" />
           <p>
             {canSignUp ? (
               <span>
@@ -180,7 +241,7 @@ export const Login = ({ userInit, isLoggedIn, history, dispatch }) => {
           </p>
         </form>
       </div>
-    </div>
+      </StyledContainer>
   );
 };
 
