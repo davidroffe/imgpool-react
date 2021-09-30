@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
 import { getFlags, deletePost } from '../actions';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -20,6 +21,12 @@ import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
+
+const FlagListContainer = styled.section`
+  max-width: 75%;
+  margin: 5% auto 0;
+  padding: 60px;
+`;
 
 function desc(a, b, orderBy) {
   if (orderBy === 'date') {
@@ -293,7 +300,7 @@ const FlagList = (props) => {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   return (
-    <section id="flag-list">
+    <FlagListContainer>
       <ToastContainer />
       <h1>
         <span>Flags</span>
@@ -391,7 +398,7 @@ const FlagList = (props) => {
           />
         </Paper>
       </div>
-    </section>
+    </FlagListContainer>
   );
 };
 

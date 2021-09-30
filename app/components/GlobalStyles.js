@@ -330,4 +330,88 @@ body {
       text-align: center;
     }
   }
+
+  .dashboard {
+    @media (max-width: 900px) {
+      max-width: none;
+    }
+  
+    .inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+  
+      @media (max-width: 720px) {
+        flex-direction: column;
+      }
+    }
+  
+    h1 {
+      width: 100%;
+      @media (max-width: 720px) {
+        order: 1;
+        margin: 0 0 35px;
+        font-size: 5rem;
+      }
+    }
+    .left {
+      max-width: 50%;
+  
+      @media (max-width: 720px) {
+        order: 3;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 30px;
+  
+        h2 {
+          flex-basis: 100%;
+        }
+        p {
+          margin: 10px 10px 10px 0;
+          font-weight: 600;
+          font-size: 1.4rem;
+          line-height: 2rem;
+  
+          span {
+            padding: 2px 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            line-height: 2rem;
+          }
+        }
+        button {
+          border: none;
+          background: none;
+          outline: none;
+          height: 2rem;
+          cursor: pointer;
+          padding: 0;
+        }
+      }
+      .button-large {
+        margin: 0;
+        font-size: 2.4rem;
+        background: none;
+        border: none;
+        padding: 0;
+        font-weight: 700;
+        cursor: pointer;
+      }
+    }
+    .right {
+      @media (max-width: 720px) {
+        order: 2;
+        margin-bottom: 35px;
+      }
+  
+      button {
+        margin-bottom: 10px;
+        @media (max-width: 720px) {
+          width: 100%;
+        }
+      }
+    }
+  }
 `;

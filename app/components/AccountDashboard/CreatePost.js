@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import FileInput from '../Utility/FileInput';
 import Modal from '../Utility/Modal';
+import BorderButton from "../Utility/BorderButton";
 
 const CreatePost = (props) => {
   return (
@@ -36,7 +37,7 @@ const CreatePost = (props) => {
             onChange={props.handleChange.bind(null, 'createPost', 'tags')}
           />
         </div>
-        <input className="border-button" type="submit" />
+        <BorderButton type="submit" as="input" />
       </form>
     </Modal>
   );
