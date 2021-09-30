@@ -2,7 +2,6 @@ const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const Dotenv = require('dotenv-webpack');
 const env = 'development';
 
@@ -28,13 +27,6 @@ module.exports = [
           ],
         },
         {
-          test: /\.css$/,
-          use: [
-            'to-string-loader',
-            'css-loader', // translates CSS into CommonJS
-          ],
-        },
-        {
           test: /\.(jpe?g|png|woff|woff2|eot|ttf|svg)(\?[a-z0-9=.]+)?$/,
           loader: 'url-loader?limit=100000',
         },
@@ -44,11 +36,6 @@ module.exports = [
       historyApiFallback: true,
     },
     plugins: [
-      new MiniCssExtractPlugin({
-        // Options similar to the same options in webpackOptions.output
-        // both options are optional
-        filename: 'index.css',
-      }),
       new CleanWebpackPlugin(),
       new Dotenv(),
       new HtmlWebpackPlugin({
@@ -80,6 +67,6 @@ module.exports = [
           loader: 'url-loader?limit=100000',
         },
       ],
-    },
+    }
   },
 ];

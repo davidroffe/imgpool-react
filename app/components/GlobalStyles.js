@@ -1,4 +1,4 @@
-import ReactToastifyCss from 'react-toastify/dist/ReactToastify.css';
+import ReactToastifyCss from '!!raw-loader!react-toastify/dist/ReactToastify.css';
 import { createGlobalStyle } from 'styled-components';
 
 export default createGlobalStyle`
