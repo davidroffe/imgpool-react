@@ -38,6 +38,7 @@ const PostSingleContainer = styled.section`
         .toggle-options {
           border: none;
           padding: 0;
+          background: none;
           font-family: sans-serif;
           font-size: 1.2rem;
           text-transform: uppercase;
