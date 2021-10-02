@@ -1,9 +1,44 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+
+const PaginatorContainer = styled.div`
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  z-index: 1;
+  width: 50px;
+  flex-direction: column;
+  justify-content: center;
+
+  button {
+    background: none;
+    border: none;
+    margin: 20px 0;
+    font-size: 2rem;
+    transform: rotate(90deg);
+    outline: none;
+    z-index: 1;
+    &:hover {
+      cursor: pointer;
+    }
+    &.active {
+      font-size: 3rem;
+    }
+  }
+
+  .page-indicator {
+    font-size: 2rem;
+    text-align: center;
+    transform: rotate(90deg);
+  }
+`;
 
 const Paginator = ({ loading, page, lastPage, changePage }) => {
   return (
-    <div className="paginator">
+    <PaginatorContainer>
       <button
         className="first"
         disabled={page < 2 || loading}
@@ -74,7 +109,7 @@ const Paginator = ({ loading, page, lastPage, changePage }) => {
       >
         ⇥
       </button>
-    </div>
+    </PaginatorContainer>
   );
 };
 

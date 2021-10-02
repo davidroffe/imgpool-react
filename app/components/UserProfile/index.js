@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { ToastContainer, toast } from 'react-toastify';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
+import BorderButton from "../Utility/BorderButton";
 import userApi from '../../api/users';
 
 const mapStateToProps = (state) => {
@@ -242,15 +243,14 @@ export const UserProfile = (props) => {
           </div>
           {props.admin ? (
             <div className="right">
-              <button
-                className={
-                  user.active ? 'border-button-red' : 'border-button-green'
+              <BorderButton
+                color={
+                  user.active ? 'red' : 'green'
                 }
-                id="toggle-account"
                 onClick={handleToggleAccountSubmit}
               >
                 {user.active ? 'Disable' : 'Enable'} Account
-              </button>
+              </BorderButton>
             </div>
           ) : null}
           {props.admin ? (

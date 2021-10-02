@@ -5,6 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 import { StaticRouter, matchPath } from 'react-router-dom';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
+import { ServerStyleSheet, StyleSheetManager } from 'styled-components'
 import imgpoolApp from '../app/reducers';
 import App from '../app/components/App';
 import routes from './routes';
@@ -30,14 +31,19 @@ function getData(ctx) {
 
 export function handleRender(ctx) {
   return getData(ctx).then((preloadedState) => {
+    const sheet = new ServerStyleSheet();
     const store = createStore(imgpoolApp, preloadedState);
     const html = ReactDOMServer.renderToString(
       <Provider store={store}>
         <StaticRouter location={ctx.url}>
-          <App />
+          <StyleSheetManager sheet={sheet.instance}>
+            <App />
+          </StyleSheetManager>
         </StaticRouter>
       </Provider>
     );
+    const styleTags = sheet.getStyleTags();
+    sheet.seal();
     const finalState = store.getState();
     const indexFile = path.resolve('./public/index.html');
     const promise = fs.promises
@@ -54,6 +60,7 @@ export function handleRender(ctx) {
                 '\\u003c'
               )}
           </script>
+          ${styleTags}
           `
         );
       })

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import GlobalStyles from './GlobalStyles';
 import { connect } from 'react-redux';
 import { closeAllMenus } from '../actions';
 import Header from './Header';
@@ -30,6 +31,7 @@ const App = (props) => {
   };
   return (
     <div onClick={handleClick}>
+      <GlobalStyles />
       <Auth>
         <Header>
           <PostSearch />

@@ -3,6 +3,50 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { getPosts } from '../actions';
+import styled from "styled-components";
+
+const StyledForm = styled.form`
+  position: relative;
+  align-self: flex-end;
+  @media (max-width: 720px) {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  > input {
+    height: 40px;
+    width: 300px;
+    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    outline: none;
+    color: #fffef2;
+    padding: 5px 30px 5px 10px;
+    font-size: 1.2rem;
+    font-family: sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04),
+      -6px 8px 15px rgba(0, 0, 0, 0.04), 6px 8px 15px rgba(0, 0, 0, 0.04);
+    &::placeholder {
+      color: #fffef2;
+    }
+    @media (max-width: 720px) {
+      width: 100%;
+    }
+  }
+
+  #clear-search {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    outline: none;
+    color: #fffef2;
+    cursor: pointer;
+  }
+`;
 
 const mapStateToProps = (state) => {
   return { searchQuery: state.search };
@@ -37,7 +81,7 @@ export const PostSearch = (props) => {
     }
   };
   return (
-    <form className="search" onSubmit={handleSubmit}>
+    <StyledForm className="search" onSubmit={handleSubmit}>
       <input
         className="search-field"
         type="text"
@@ -50,7 +94,7 @@ export const PostSearch = (props) => {
           ✕
         </button>
       ) : null}
-    </form>
+    </StyledForm>
   );
 };
 

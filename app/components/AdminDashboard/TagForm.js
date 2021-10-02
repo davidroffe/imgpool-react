@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Select from 'react-select';
 import PropTypes from 'prop-types';
 import Modal from '../Utility/Modal';
+import BorderButton from "../Utility/BorderButton";
 
 const TagForm = props => {
   const [selectedTags, setSelectedTags] = useState([]);
@@ -41,20 +42,19 @@ const TagForm = props => {
             onChange={handleChange}
           />
         </div>
-        <button
+        <BorderButton
           id="toggle-state"
-          className="border-button"
           onClick={handleSubmit}
         >
           Toggle State
-        </button>
-        <button
+        </BorderButton>
+        <BorderButton
           id="delete"
-          className="border-button-red"
+          color="red"
           onClick={handleSubmit}
         >
           Delete
-        </button>
+        </BorderButton>
       </form>
     </Modal>
   );

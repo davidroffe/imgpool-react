@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from '../Utility/Modal';
+import BorderButton from "../Utility/BorderButton";
 
 const EditAccount = (props) => {
   return (
@@ -78,7 +79,7 @@ const EditAccount = (props) => {
             />
           ) : null}
         </div>
-        <input className="border-button" type="submit" />
+        <BorderButton type="submit" as="input" />
       </form>
     </Modal>
   );

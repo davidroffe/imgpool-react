@@ -2,11 +2,97 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { editUser, createNewPost } from '../../actions';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import { ToastContainer, toast } from 'react-toastify';
+import BorderButton from "../Utility/BorderButton";
 import CreatePost from './CreatePost';
 import EditAccount from './EditAccount';
 import Loader from '../Utility/Loader';
 import userApi from '../../api/users';
+
+const AccountContainer = styled.section`
+  @media (max-width: 900px) {
+    max-width: none;
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    @media (max-width: 720px) {
+      flex-direction: column;
+    }
+  }
+
+  h1 {
+    width: 100%;
+    @media (max-width: 720px) {
+      order: 1;
+      margin: 0 0 35px;
+      font-size: 5rem;
+    }
+  }
+  .left {
+    max-width: 50%;
+
+    @media (max-width: 720px) {
+      order: 3;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 30px;
+
+      h2 {
+        flex-basis: 100%;
+      }
+      p {
+        margin: 10px 10px 10px 0;
+        font-weight: 600;
+        font-size: 1.4rem;
+        line-height: 2rem;
+
+        span {
+          padding: 2px 0;
+          background-color: rgba(0, 0, 0, 0.6);
+          line-height: 2rem;
+        }
+      }
+      button {
+        border: none;
+        background: none;
+        outline: none;
+        height: 2rem;
+        cursor: pointer;
+        padding: 0;
+      }
+    }
+    .button-large {
+      margin: 0;
+      font-size: 2.4rem;
+      background: none;
+      border: none;
+      padding: 0;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  }
+  .right {
+    @media (max-width: 720px) {
+      order: 2;
+      margin-bottom: 35px;
+    }
+
+    button {
+      margin-bottom: 10px;
+      @media (max-width: 720px) {
+        width: 100%;
+      }
+    }
+  }
+`;
 
 const mapStateToProps = (state) => {
   return {
@@ -141,7 +227,7 @@ const Dashboard = ({
       });
   };
   return (
-    <section className="container dashboard" id="account-dashboard">
+    <AccountContainer className="container">
       <ToastContainer />
       {userInit && loggedIn ? (
         <div className="inner">
@@ -215,9 +301,7 @@ const Dashboard = ({
             </div>
           </div>
           <div className="right">
-            <button
-              className="border-button"
-              id="create-post"
+            <BorderButton
               onClick={() =>
                 setCreatePost({
                   ...createPost,
@@ -226,10 +310,10 @@ const Dashboard = ({
               }
             >
               Create Post
-            </button>
-            <button className="border-button" id="logout" onClick={logout}>
+            </BorderButton>
+            <BorderButton onClick={logout}>
               Log Out
-            </button>
+            </BorderButton>
           </div>
           <EditAccount
             handleSubmit={handleEditSubmit}
@@ -248,7 +332,7 @@ const Dashboard = ({
         </div>
       ) : null}
       <Loader show={!userInit && !loggedIn} />
-    </section>
+    </AccountContainer>
   );
 };
 

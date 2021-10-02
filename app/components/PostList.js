@@ -2,11 +2,54 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { getPosts, setTagsFromExistingPosts } from '../actions';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import TagMenu from './TagMenu';
 import Paginator from './Paginator';
 import PostListItem from './PostListItem';
 import Loader from './Utility/Loader';
 import Splash from './Splash';
+
+const PostListContainer = styled.section`
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 40px 45px;
+  @media (max-width: 720px) {
+    justify-content: flex-start;
+    margin: 15px 45px;
+  }
+
+  .post-item {
+    margin: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+    @media (max-width: 720px) {
+      width: 50%;
+      margin: 0;
+    }
+
+    img {
+      display: block;
+      transition: transform 0.5s;
+      @media (max-width: 720px) {
+        width: 100%;
+      }
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+  #load-more-container {
+    flex-basis: 100%;
+    margin-top: 25px;
+
+    #load-more {
+      margin: 0 auto;
+    }
+  }
+`;
 
 const mapStateToProps = (state) => {
   return {
@@ -46,11 +89,11 @@ export const PostList = ({ posts, dispatch }) => {
       <div>
         <TagMenu />
         {posts.loading ? (
-          <section id="post-list">
+          <PostListContainer>
             <Loader show={posts.loading} />
-          </section>
+          </PostListContainer>
         ) : (
-          <section id="post-list">
+          <PostListContainer>
             {posts.list.map((post) => {
               return (
                 <PostListItem
@@ -61,7 +104,7 @@ export const PostList = ({ posts, dispatch }) => {
                 />
               );
             })}
-          </section>
+          </PostListContainer>
         )}
         <Paginator
           changePage={changePage}

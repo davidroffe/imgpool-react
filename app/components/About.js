@@ -1,8 +1,30 @@
 import React from 'react';
+import styled from 'styled-components';
+
+const StyledSection = styled.section`
+  h1 {
+    @media (max-width: @mobile) {
+      margin: 0 0 35px;
+      font-size: 5rem;
+    }
+  }
+  p {
+    margin: 10px 0;
+    font-weight: 600;
+    font-size: 1.4rem;
+    line-height: 2rem;
+
+    span {
+      padding: 2px 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      line-height: 2rem;
+    }
+  }
+`;
 
 const About = () => {
   return (
-    <section className="container" id="about">
+    <StyledSection className="container">
       <h1>
         <span>About</span>
       </h1>
@@ -21,7 +43,7 @@ const About = () => {
         quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo
         voluptas nulla pariatur?
       </p>
-    </section>
+    </StyledSection>
   );
 };
 

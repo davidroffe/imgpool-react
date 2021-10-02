@@ -1,15 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 import { ToastContainer, toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { getFlags } from '../../actions';
 import TagForm from './TagForm';
 import UserSelectForm from './UserSelectForm';
 import Loader from '../Utility/Loader';
+import BorderButton from "../Utility/BorderButton";
 import settingsApi from '../../api/setting';
 import tagsApi from '../../api/tags';
 import userApi from '../../api/users';
+
+const AdminDashboardContainer = styled.section`
+  #admin-manage-form {
+    padding: 20px 50px 0;
+
+    .admin-manage-select__control {
+      border-radius: 0;
+      border-color: #333;
+      box-shadow: none !important;
+
+      .admin-manage-select__indicators {
+        .admin-manage-select__indicator-separator {
+          background-color: #333;
+        }
+        .admin-manage-select__indicator {
+          color: #333;
+        }
+      }
+    }
+    .admin-manage-select__menu {
+      border-radius: 0;
+
+      .admin-manage-select__option {
+        &:hover,
+        &:active,
+        &--is-focused {
+          background-color: #eaeaea;
+        }
+      }
+    }
+    button {
+      margin: 0 auto 15px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+`;
 
 const mapStateToProps = (state) => {
   return {
@@ -96,7 +137,7 @@ const Dashboard = ({ history, dispatch, userInit, loggedIn, admin, flags }) => {
   };
 
   return (
-    <section className="container dashboard" id="account-dashboard">
+    <AdminDashboardContainer className="container dashboard">
       <ToastContainer />
       {userInit && loggedIn ? (
         <div className="inner">
@@ -143,13 +184,11 @@ const Dashboard = ({ history, dispatch, userInit, loggedIn, admin, flags }) => {
             </div>
           </div>
           <div className="right">
-            <button
-              className="border-button"
-              id="toggle-signup"
+            <BorderButton
               onClick={toggleSignup}
             >
               {canSignUp ? 'Disable' : 'Enable'} Signups
-            </button>
+            </BorderButton>
           </div>
           <TagForm
             show={showTagForm}
@@ -166,7 +205,7 @@ const Dashboard = ({ history, dispatch, userInit, loggedIn, admin, flags }) => {
         </div>
       ) : null}
       <Loader show={!userInit} />
-    </section>
+    </AdminDashboardContainer>
   );
 };
 
