@@ -90,7 +90,7 @@ export const PostSearch = (props) => {
         onChange={handleChange}
       />
       {searchField.length > 0 ? (
-        <button id="clear-search" onClick={clearSearch}>
+        <button id="clear-search" type="button" onClick={clearSearch}>
           ✕
         </button>
       ) : null}
